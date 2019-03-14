@@ -1,11 +1,10 @@
 ## 출처
 
-- 이 포스팅은 https://github.com/leonardomso/33-js-concepts 에 있는 https://medium.com/@gaurav.pandvia/understanding-javascript-function-executions-tasks-event-loop-call-stack-more-part-1-5683dea1f5ec 글을 제 멋대로 번역한 것입니다. 오역나 의역이 있을 수 있습니다. 지적해주시면 확인 후 바로 정정하겠습니다.
+- 이 포스팅은 https://github.com/leonardomso/33-js-concepts 에 있는 https://medium.com/@gaurav.pandvia/understanding-javascript-function-executions-tasks-event-loop-call-stack-more-part-1-5683dea1f5ec 글을 제 멋대로 번역한 것입니다. 오역이나 의역이 있을 수 있습니다. 지적해주시면 확인 후 바로 정정하겠습니다.
 
 - original source of this posting is from https://medium.com/@gaurav.pandvia/understanding-javascript-function-executions-tasks-event-loop-call-stack-more-part-1-5683dea1f5ec If the original author requests deletion, it will be deleted immediately.
 
-## 자바스크립트 함수 실행에 대한 이해
-### 콜 스택, 이벤트 루프, Task 그리고 그 외 등등...
+## 자바스크립트 함수 실행에 대한 이해 (콜 스택, 이벤트 루프, Task 그리고 그 외 등등...)
  웹 개발자 또는 프론트 엔드 개발자라 불리는 사람들은 요즘 브라우저 내에서 상호작용하는 액션부터 컴퓨터 게임, 데스크탑 위젯, 크로스 플랫폼 모바일 어플리케이션, DB와 연결하는 서버 사이드 코딩 등 모든 것들을 스크립팅 언어로 구현해버립니다. 이렇게 많은 일을 하는 자바스크립트를 더욱 효율적으로 사용할 수 있도록 자바스크립트의 내부 동작을 아는 것이 이 포스팅의 목적입니다.
  
  자바스크립트 환경(ecosystem)은 그 어느 때보다 복잡해졌고 앞으로 더욱 복잡해질 것입니다. 현대적인 모바일 웹앱을 만들기 위해 요구되는 것은 너무나 많습니다. 웹팩, 바벨, ESLint, Mocha, Karma, Grunt ... etc... 우리는 무엇을 사용해야 하고 이 많은 툴들은 무슨 일을 하는 걸까요? 저는 현대 웹 개발자들이 겪고있는 어려움을 완벽히 그려낸 이 웹툰을 찾았습니다.
@@ -39,7 +38,8 @@
 ![javascriptVRModel.png](https://images.velog.io/post-images/jakeseo_me/4575e6d0-456c-11e9-9537-05fa53649e18/javascriptVRModel.png)  
 > Visual Representation of JS Model(credits[https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop])
   
-1. 콜 스택 : 함수의 호출을 기록하는 자료구조입니다. 기본적으로 우리가 프로그램 안에서 위치한 곳이죠. 만약 우리가 어떤 함수를 실행시킨다면, 우리는 스택 위에 무언가를 올리는(push) 행위를 하는 겁니다. 그리고 우리가 함수로 부터 반환을 받을 때, 우리는 스택의 맨 위를 가져오는(pop) 것이죠.
+### 1. 콜 스택  
+ 함수의 호출을 기록하는 자료구조입니다. 기본적으로 우리가 프로그램 안에서 위치한 곳이죠. 만약 우리가 어떤 함수를 실행시킨다면, 우리는 스택 위에 무언가를 올리는(push) 행위를 하는 겁니다. 그리고 우리가 함수로 부터 반환을 받을 때, 우리는 스택의 맨 위를 가져오는(pop) 것이죠.
 
 ![callstack.gif](https://images.velog.io/post-images/jakeseo_me/fc418e50-456c-11e9-83dd-8359947fc569/callstack.gif)  
 > JS Stack Visualization (GIF)
