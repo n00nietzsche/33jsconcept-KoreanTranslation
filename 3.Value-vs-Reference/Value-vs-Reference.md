@@ -243,3 +243,31 @@ console.log(personObj1); // -> {name: 'Alex', age: 25}
 console.log(personObj2); // -> {name: 'John', age: 50}
 ```
 
+함수의 파라미터로 할당되는 것들은 `=` 연산자로 할당하는 것과 같다는 것을 기억하세요. 함수 속 변수 `person`은 `personObj1`로 향하는 참조를 갖고 있어서 처음에 전달 받은 객체에 직접 변화를 가합니다. 우리가 `person` 을 새로운 객체로 재할당 한 뒤에는 원본 객체에 더 이상 영향을 미치지 않습니다.
+
+이 재할당은 바깥 스코프에 있는 `personObj1`가 가리키는 객체를 변경하지 않습니다. `person` 변수는 새로운 참조를 갖게 됩니다. 왜냐하면 이 변수는 단순히 재할당 됐을 뿐이고 이 재할당은 `personObj1`에 아무런 영향도 미치지 않기 때문이죠.
+
+```javascript
+function changeAgeAndReference(person) {
+	person.age = 25;
+	person = {
+		name: 'John',
+		age: 50
+    };
+	return person;
+}
+
+var personObj1 = {
+	name: 'Alex',
+	age: 30
+};
+
+var personObj2 = changeAgeAndReference(personObj1);
+
+console.log(personObj1); // -> {name: 'Alex', age: 25}
+console.log(personObj2); // -> {name: 'John', age: 50}
+```
+
+우리가 이 함수를 사용할 때 유일한 차이점은 일단 함수가 끝나고 나면 함수 내부에 있던 `person`이 더이상 스코프 안에 있지 않다는 점입니다.
+
+이게 끝입니다.
