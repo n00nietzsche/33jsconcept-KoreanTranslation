@@ -191,3 +191,55 @@ console.log(chnagedAlex); // -> {name: 'Alex', age: 25}
 이 비순수함수는 객체를 받아서 `age` 프로퍼티를 `25`라는 값으로 바꿉니다. 객체로 받아온 값에 그대로 명령을 실행하기 때문에 이 함수는 `alex` 객체를 직접적으로 변화시킵니다. 이 함수가 `person` 객체를 반환할 때, 이 함수는 받았던 객체 그대로를 반환합니다. `alex`와 `alexChanged`는 같은 참조를 가집니다. `person` 변수를 반환하고 그 참조를 다시 새로운 변수에 저장하는 것은 사실 쓸데없는 행동이죠.
 
 이제 순수 함수를 보도록 합시다.
+```javascript
+function changeAgePure(person) {
+	var newPerson = JSON.parse(JSON.stringify(person));
+	newPersonObj.age = 25;
+	return newPersonObj;
+};
+
+var alex = {
+	name: 'Alex',
+	age: 30
+};
+
+var alexChanged = changeAgePure(alex);
+
+console.log(alex); // -> {name: 'Alex', age: 30}
+console.log(alexChanged); // -> {name: 'Alex', age: 25}
+```
+이 함수에서 우리가 넘겨받은 객체를 문자열로 변화시키기 위하여 우리는 `JSON.stringify`함수를 사용합니다. 그리고 `JSON.parse`함수를 이용하여 다시 객체로 만듭니다. 이러한 과정을 거치면서 새로운 객체를 만들고 그 결과 값을 새로운 변수에 저장합니다. 이와 같은 일을 하기 위한 다른 방법들도 있습니다. 원본 객체의 프로퍼티를 반복해서 새로운 객체에 할당하는 것과 같은 방법말이죠. 하지만 우리가 위에서 한 방법이 가장 간단합니다. 새 객체는 원본과 같은 프로퍼티들을 가집니다. 하지만 메모리 상에서는 이 두 객체는 다른 주소 값을 가지고 구분될 수 있습니다.
+
+우리가 이 새로운 객체에서 `age` 프로퍼티를 변경할 때, 원본은 전혀 영향을 받지 않습니다. 이 함수는 지금 순수합니다. 이 함수는 바깥 스코프에 아무런 영향을 미치지 않습니다. 심지어 인자로 받은 객체까지도요. 새롭게 만들어진 객체는 반환이 되어야 합니다. 그리고 새로운 변수에 저장되어야 하죠. 그렇지 않으면 결과 값은 가비지 콜렉션 될 것이고 결과 객체는 어디에도 남지 않게 되겠죠.
+
+### 자가 테스트
+값(value) vs 참조(reference)는 코딩 인터뷰에서 많이 출제되곤 합니다. 무엇이 로그에 남겨질지 한번 스스로 추측해보세요.
+
+```javascript
+function changeAgeAndReference(person) {
+	person.age = 25;
+	person = {
+		name: 'John',
+		age: 50
+    };
+	return person;
+}
+
+var personObj1 = {
+	name: 'Alex',
+	age: 30
+};
+
+var personObj2 = changeAgeAndReference(personObj1);
+
+console.log(personObj1); // -> ?
+console.log(personObj2); // -> ?
+```
+
+함수는 처음에 넘겨진 원본 객체의 프로퍼티 `age`를 변경합니다. 그 후에 변수 값에 새로운 객체를 다시 할당합니다. 그리고 그 객체를 반환합니다. 두 로그의 결과는 다음과 같습니다.
+
+```javascript
+console.log(personObj1); // -> {name: 'Alex', age: 25}
+console.log(personObj2); // -> {name: 'John', age: 50}
+```
+
