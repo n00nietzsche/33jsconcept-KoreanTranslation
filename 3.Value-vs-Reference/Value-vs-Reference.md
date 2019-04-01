@@ -171,3 +171,23 @@ var twoHundred = multiply(hundred, two);
 
 여기서 순수 함수와 순수함수가 아닌 것을 비교해봅시다.
 
+```javascript
+function changeAgeImpure(person) {
+	person.age = 25;
+	return person;
+}
+
+var alex = {
+	name: 'Alex',
+	age: 30
+};
+
+var changedAlex = changedAgeImprue(alex);
+
+console.log(alex); // -> {name: 'Alex', age: 25}
+console.log(chnagedAlex); // -> {name: 'Alex', age: 25}
+```
+
+이 비순수함수는 객체를 받아서 `age` 프로퍼티를 `25`라는 값으로 바꿉니다. 객체로 받아온 값에 그대로 명령을 실행하기 때문에 이 함수는 `alex` 객체를 직접적으로 변화시킵니다. 이 함수가 `person` 객체를 반환할 때, 이 함수는 받았던 객체 그대로를 반환합니다. `alex`와 `alexChanged`는 같은 참조를 가집니다. `person` 변수를 반환하고 그 참조를 다시 새로운 변수에 저장하는 것은 사실 쓸데없는 행동이죠.
+
+이제 순수 함수를 보도록 합시다.
