@@ -77,3 +77,49 @@ console.log(x, y, a, b); // -> 10, 'abc', 10, 'abc'
 
 `arr`이 가진 변수의 값(주소)은 정적임을 인지해야 합니다. 변수의 값이 바뀌는 것이 아닌 메모리 속의 배열 값만 바뀌는 것입니다. 우리가 무언가 하려고 `arr`을 사용할 때, 이를테면 값의 push같은 일을 할 때, 자바스크립트 엔진은 메모리 속의 `arr`의 위치로 갑니다. 그리고 거기에 저장된 정보를 이용하여 작업을 수행하죠.
 
+### 참조로 할당하기
+객체와 같은 참조 타입의 값이 `=`과 같은 키워드를 이용하여 다른 변수로 복사될 때, 그 값의 주소는 실제로 복사됩니다. 마치 원시타입의 할당처럼요. 객체는 값 대신 참조로 복사됩니다.
+
+```javascript
+var reference = [1];
+var refCopy = reference;
+```
+
+위와 같은 코드는 메모리상에서는 아래와 같이 표기됩니다.
+
+![arr3.png](https://images.velog.io/post-images/jakeseo_me/a6522a60-546a-11e9-ab21-e18f506a09b0/arr3.png)
+
+각각의 변수는 이제 같은 배열로 향하는 레퍼런스를 갖습니다. 이 말은 우리가 `reference`나 `refCopy`를 건드려보면 다음과 같은 결과를 얻게 됨을 의미합니다.
+
+```javascript
+reference.push(2);
+console.log(reference, refCopy); // -> [1, 2], [1, 2]
+```
+
+우리는 `2`를 메모리 속에 있는 배열에 `push` 했습니다. 우리가 `reference`와 `refCopy`를 사용할 때 우리는 같은 배열을 가리키게 됩니다.
+
+### 참조 재할당하기
+참조 값을 재할당 하는 것은 오래된 참조를 대체합니다.
+
+```javascript
+var obj = { first: 'reference' };
+```
+
+메모리 상태 :
+
+![arr4.png](https://images.velog.io/post-images/jakeseo_me/fbb45a20-546d-11e9-ab21-e18f506a09b0/arr4.png)
+
+우리가 두번째 줄을 입력한다면:
+
+```javascript
+var obj = { first: 'reference' };
+obj = { second: 'ref2' }
+```
+
+`obj`안에 저장됐던 주소 값은 변경됩니다. 첫번째 객체는 아직 메모리 상에 표기가 되긴 합니다. 다음과 같이 말이죠.
+
+![arr5.png](https://images.velog.io/post-images/jakeseo_me/449e94d0-546e-11e9-a095-d742f66aa765/arr5.png)
+
+남아있는 객체를 가리키는 참조가 남아있지 않을 때, 위의 사진에 보이는 주소 값 `#234`이 보이는 것처럼, 자바스크립트 엔진은 `가비지 컬렉션(garbage collection)`을 동작시킬 수 있습니다. 이것은 프로그래머가 모든 참조를 날리고 객체를 더이상 사용할 수 없게 된 뒤 자바스크립트 엔진은 그 주소로 가 사용되지 않는 객체를 메모리로부터 안전하게 지워버리는 것을 의미합니다. 이 경우에는 객체 `{ first: 'reference' }`가 더이상 접근 불가능하고 가비지 콜렉션 될 수 있습니다.
+
+### ==와 ===
