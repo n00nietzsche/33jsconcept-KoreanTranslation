@@ -68,3 +68,11 @@ console.log(x, y, a, b); // -> 10, 'abc', 10, 'abc'
 ```
 
 메모리 안에서 1과 2의 표기는 다음과 같습니다.
+
+1.
+![arr1.png](https://images.velog.io/post-images/jakeseo_me/95025c90-5469-11e9-ab21-e18f506a09b0/arr1.png)
+
+2.
+![arr2.png](https://images.velog.io/post-images/jakeseo_me/97722410-5469-11e9-ab21-e18f506a09b0/arr2.png)
+
+
