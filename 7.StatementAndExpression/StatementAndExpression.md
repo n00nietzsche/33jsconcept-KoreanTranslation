@@ -21,7 +21,7 @@
 
 표현식(Expression)은 문장(Statement)처럼 동작할 수 있기 때문에 이 둘을 구분하는 것은 중요합니다. 그리고 이것이 표현문(Expression statement)이 존재하는 이유기도 하죠. 하지만 반대로 봤을 때 문장(Statement)은 표현식(Expression)처럼 동작할 수 없습니다.
 
-# 표현식
+# 표현식(Expressions)
 ## 표현식은 값을 만들어낸다
 
 표현식은 값 하나로 귀결되는 자바스크립트 코드 조각(snippet)입니다. 표현식은 우리가 원하는만큼 길어질 수 있지만 언제나 동일한 값이 나오진 않죠.
@@ -96,3 +96,29 @@ assignedVariable = foo(14)
 
 이 편이 더욱 가독성이 좋고, 어딘가에 끼워넣기 좋으며 표현식(Expression)과 문장(Statement) 사이에서 확연히 구분이 됩니다. 이것이 선언적이고 함수적인 자바스크립트의 기반입니다.
 
+# 문장(Statements)
+
+함수형 프로그래밍의 관점에서 문장은 골치덩어리(headache)입니다. 기본적으로 문장은 무언가 수행합니다.
+
+자바스크립트에서 문장은 값이 들어와야 할 곳에 들어갈 수 없습니다. 그래서 그들은 함수의 인자로도, 대입 연산의 값으로도, 연산자의 피연산자로도 사용될 수 없습니다.
+
+```js
+foo(if () {return 2}) // js engine mind = blown
+```
+
+자바스크립트의 문장(Statement)은 다음과 같습니다.
+1. if
+2. if-else
+3. while
+4. do-while
+5. for
+6. switch
+7. for-in
+8. with (deprecated)
+9. debugger
+10. variable declaration
+
+브라우저의 콘솔에 다음과 같은 코드를 치고 엔터를 치면 어떻게 될까요?
+```js
+if (true) {9+9}
+```
