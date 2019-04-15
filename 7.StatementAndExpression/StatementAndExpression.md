@@ -50,7 +50,7 @@ true && declaredVariable
 console.log(true && 2 * 9) // 18
 ```
 
-## 표현식은 상태(State)를 바꿀 필요가 없다.
+## 표현식은 반드시 상태(State)를 바꿀 필요는 없다.
 
 예를 들면,
 
@@ -66,7 +66,7 @@ assignedVariable - 10 // 표현식(Expression)입니다.
 console.log(assignedVariable) // 2
 ```
 
-위의 짤막한 코드의 모든 표현식에도 불구하고 assignedVariable의 값은 여전히 2입니다. 그래서 왜 이 섹션의 맨 위에 `반드시` 등장시켰냐면 함수 호출은 표현식이기 때문입니다. 하지만 함수는 값을 변화시키는 문장(Statement)을 포함할 수 있습니다. foo 내부의 `foo()` 함수는 undefined나 어떤 다른 값을 반환할 수 있는 표현식입니다. 하지만 만일 `foo`가 다음과 같이 작성됐다면,
+위의 짤막한 코드의 모든 표현식에도 불구하고 assignedVariable의 값은 여전히 2입니다. 그래서 왜 이 섹션의 제목에 왜 `반드시`라는 단어를 등장시켰냐면 함수 호출은 표현식이기 때문입니다. 하지만 함수는 값을 변화시키는 문장(Statement)을 포함할 수 있습니다. foo 내부의 `foo()` 함수는 undefined나 어떤 다른 값을 반환할 수 있는 표현식입니다. 하지만 만일 `foo`가 다음과 같이 작성됐다면,
 
 ```js
 const foo = foo () => {
