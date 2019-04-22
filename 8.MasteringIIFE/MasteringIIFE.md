@@ -192,3 +192,20 @@ IIFE가 진짜 잘하는 것 중 하나는 IIFE를 위한 함수 스코프를 �
 
 예제를 봅시다.
 
+```js
+(function IIFE_initGame() {
+  // IIFE 밖에서는 접근할 수 없는 Private 변수들입니다.
+  var lives;
+  var weapons;
+  
+  init();
+  
+  // IIFE 밖에서는 접근할 수 없는 Private 함수입니다.
+  function init() {
+    lives = 5;
+    weapons = 10;
+  }
+}());
+```
+
+이 예제에서, 
