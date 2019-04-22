@@ -46,3 +46,6 @@ main();
 ![js eventloop.png](https://images.velog.io/post-images/jakeseo_me/880f3bc0-64c7-11e9-b2ea-0394058a2650/js-eventloop.png)
 > 코드 실행 중 내부에서 일어나는 일들
 
+1. 메인 함수에 대한 호출이 먼저 프레임으로 stack에 push 됩니다. 그 후에 브라우저가 메인 함수 내부의 첫번째 statement(`console.log('A')`)를 stack에 넣습니다. 이 statement가 실행되고 완료되자마자 해당 프레임은 스택에서 pop 됩니다. 알파벳 A가 콘솔에 표기됩니다.
+
+2. 다음 statement (`setTimeout()`
