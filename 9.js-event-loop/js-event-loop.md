@@ -48,4 +48,7 @@ main();
 
 1. 메인 함수에 대한 호출이 먼저 프레임으로 stack에 push 됩니다. 그 후에 브라우저가 메인 함수 내부의 첫번째 statement(`console.log('A')`)를 stack에 넣습니다. 이 statement가 실행되고 완료되자마자 해당 프레임은 스택에서 pop 됩니다. 알파벳 A가 콘솔에 표기됩니다.
 
-2. 다음 statement (`setTimeout()`
+2. 다음 statement (콜백 `exec()`과 함께 0ms의 딜레이를 가진 `setTimeout()`)가 콜스택으로 push되고 실행됩니다. setTimeout 함수는 제공된 콜백을 딜레이하기 위해 브라우저 API를 사용합니다. 일단 타이머를 돌리기 위해 콜백이 브라우저로 넘어가면 `setTimeout()`을 가진 프레임은 pop됩니다.
+
+3. 브라우저에서 `exec()` 실행을 위한 타이머가 돌아가는 도중에 console.log('C')가 콜스택에 push됩니다. 이러한 경우에는 제공된 딜레이는 0ms 였기 때문에, 콜백은 브라우저가 콜백을 받자마자 메시지 큐에 바로 추가됩니다. (이상적인 경우)
+
