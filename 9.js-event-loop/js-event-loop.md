@@ -14,3 +14,4 @@
 
 # 기본 아키텍쳐
 
+![js architecture.png](https://images.velog.io/post-images/jakeseo_me/b51d4c60-64c2-11e9-9b04-61e622359bb6/js-architecture.png)
