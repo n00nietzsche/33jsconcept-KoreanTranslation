@@ -235,3 +235,32 @@ alert(result); // "From IIFE" 메시지를 출력합니다.
 
 이건 우리가 모듈 패턴의 예제처럼 사용하게 될 정말 강력한 패턴입니다.
 
+# 파라미터가 있는 IIFE
+
+IIFE는 값을 리턴할 수 있을 뿐만 아니라, 호출될 때, 인자를 받을 수도 있습니다. 간단한 예제를 봅시다.
+
+```js
+(function IIFE(msg, times) {
+  for (var i=1; i<=times; i++){
+    console.log(msg);  
+  }
+}("Hello!", 5));
+```
+
+1. 위의 예제의 첫번째 줄에서, IIFE는 ***msg, times*** 각각 두개의 파라미터를 갖습니다.
+2. 우리가 5번째 줄에서 IIFE를 실행할 때, 여태까지 사용했던 빈 괄호 ***()*** 대신에 인자(arguments)를 IIFE로 넘겼습니다.
+3. 2번째 3번째 줄은 이 파라미터를 IIFE 내부에서 사용합니다.
+
+이건 정말 강력한 패턴입니다. 그리고 jQuery 코드와 여타 라이브러리에서 이러한 형식이 자주 사용됩니다.
+
+```js
+(function($, global, document) {
+  // jQuery를 위해 $를 사용하고, window를 위해 global을 사용합니다.
+}(jQuery, window, document));
+```
+
+위의 예제 3번째 줄에서, 우리는 ***jQuery, window, document***를 IIFE에 인자로 넘겼습니다. IIFE 내부의 코드는 ***$, global, document***를 각각 참조할 수 있습니다.
+
+IIFE에 파라미터를 넘김으로써 다음과 같은 이점을 얻을 수 있습니다.
+
+1. 
