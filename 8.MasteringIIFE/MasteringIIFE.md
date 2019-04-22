@@ -270,3 +270,84 @@ IIFE에 위의 파라미터를 넘김으로써 다음과 같은 이점을 얻을
 > 역자 주: 축소기는 억지로 번역하다보니 minifier로 번역했습니다. 영어 그 자체 minifier로 생각하심이 더욱 수월할 겁니다.
 
 # 클래식한 자바스크립트 모듈 패턴
+
+이제 자바스크립트 IIFE를 마스터했습니다. 이제 IIFE와 클로져가 들어간 끝내주는 모듈 패턴을 봅시다.
+
+우리는 클래식한 ***Sequence*** 싱글톤 객체를 구현할 것입니다. 이 객체는 실수로 현재의 값이 오염되거나 하는 것 없이 제대로 작동합니다.
+
+우리는 어떤 일이 일어나는지 순차적으로 이해하기 위해, 2단계에 걸쳐 이 코드를 작성할 것입니다.
+
+```js
+var Sequence = (function sequenceIIFE() {
+  // 현재 counter 값을 저장하기 위한 Private 변수입니다.
+  var current = 0;
+  
+  // IIFE에서 반환되는 객체입니다.
+  return {
+  };
+  
+}());
+
+alert(typeof Sequence); // alert("Object");
+```
+
+1. 위의 예제에서 우리는 객체를 반환하는 IIFE를 만들었습니다. 7번째와 8번째 줄을 보시면 나옵니다.
+2. 우리는 또 IIFE 내부에 ***current***라는 이름을 갖는 지역 변수를 만들었습니다.
+3. 이 예제에서 IIFE의 반환 값인 객체는 ***Sequence***라는 변수에 할당됩니다. 12번째 줄에서는 우리가 IIFE에서 반환한 "object" 메시지를 올바르게 출력하고 있습니다.
+
+이제 우리가 리턴하는 객체에 몇가지 함수를 추가하면서, 다음 단계로 가봅시다.
+
+```js
+var Sequence = (function sequenceIIFE() {
+
+  // 현재 counter 값을 저장하기 위한 Private 변수
+  var current = 0;
+  
+  // IIFE로 부터 반환 받는 객체
+  return {
+    getCurrentValue: function() {
+      return current;  
+    },
+    
+    getNextValue: function() {
+      current = current + 1;
+      return current;
+    }
+  };
+  
+}());
+
+console.log(Sequence.getNextValue()); // 1
+console.log(Sequence.getNextValue()); // 2
+console.log(Sequence.getCurrentValue()); // 2
+```
+
+1. 이 예제에서, IIFE가 리턴하는 객체에 우리는 2가지 함수를 추가했습니다.
+2. 8-10번째 줄은 ***current*** 변수가 가진 값을 반환하는 ***getCurrentValue** 함수를 추가했습니다.
+3. 12-15번째 줄은 ***current*** 변수를 1 증가시키고 반환하는 ***getNextValue*** 함수를 추가했습니다.
+
+***current*** 변수가 IIFE에서 private하기 때문에, 클로져를 통해 여기에 접근할 수 있는 함수 말고는 누구도 ***current*** 변수의 값에 접근하거나 그 값을 수정할 수 없습니다.
+
+> 클로져를 마스터하고 싶으시다면, 저자의 클로져 튜토리얼인 [Learning JavaScript Closures through the Laws of Karma.](https://engineering.salesforce.com/learn-javascript-closures-through-the-laws-of-karma-49d32d35b3f7?gi=84230a5226b6)를 읽어보세요.
+
+# 괄호를 생략할 때
+
+함수 표현식에서 앞뒤에 괄호를 해주는 이유는 기본적으로 함수가 statement의 형태가 아닌 식(expression)의 형태가 되도록 만들어주기 위함입니다.
+
+하지만 자바스크립트 엔진이 판단하기에 해당 코드가 명확히 함수 표현식이라면, 우리는 기술적으로 감싸는 괄호를 하지 않아도 될 것입니다. 아래의 예제처럼요.
+
+```js
+var result = funciton() {
+  return "From IIFE!";
+}();
+```
+
+위의 예제에서, ***function*** 키워드는 statement의 첫번째 단어가 아닙니다. 그래서 자바스크립트 엔진은 이걸 statement 또는 정의(definition)로 판단하지 않습니다. 비슷하게, 식이라는게 명확하다면, 다른 곳에도 괄호를 생략할 수 있는 곳들이 있습니다.
+
+하지만 저자는 언제나 괄호를 적는 것을 선호합니다. 위의 경우처럼 괄호가 필요 없는 경우까지요. 괄호를 사용하는 것은 가독성을 높여줍니다. 읽는 사람이 첫 줄만 보고도 그 함수가 IIFE가 될 것이라는 것을 알 수 있게 문체적으로 넌지시 힌트를 줍니다. 그들은 그들이 읽는 것이 IIFE라는 것을 알아내기 위해 끝까지 스크롤을 넘길 필요가 없습니다.
+
+이제 IIFE를 코드에 적용시키기 위해 알아야 할 모든 것을 살펴봤습니다. IIFE는 우리의 코드를 더 정렬되고 더 아름답게 만드는 것을 돕진 않습니다. IIFE는 쓸데 없는 전역 변수를 만드는 것을 피함으로써 버그를 줄이는데 도움을 줍니다. 이제 당신은 인증된 IIFE 닌자입니다.
+
+저자는 이러한 자바스크립트 튜토리얼을 쓰는 것을 즐깁니다. 이러한 글을 쓰는 것은 매우 재밌습니다. 하지만 퇴고하고 퍼블리시하는데는 많은 시간이 걸립니다. 만일 이 튜토리얼이 유용하다고 느꼈다면 하트 버튼을 클릭해주세요. 
+
+> [저자의 원문은 여기](https://medium.com/@vvkchandra/essential-javascript-mastering-immediately-invoked-function-expressions-67791338ddc6) 있으니 가서 하트버튼을 한번 클릭해줍시다.
