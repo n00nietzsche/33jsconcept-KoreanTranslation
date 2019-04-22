@@ -43,3 +43,6 @@ main();
 
 우리는 'A'와 'C'를 콘솔에 로깅하는 2개의 `console.log`를 가진 main 함수를 갖고 있습니다. 그리고 그 사이에 'B'를 콘솔에 로깅하는 0ms의 딜레이를 가진 setTimeout 함수를 호출합니다.
 
+![js eventloop.png](https://images.velog.io/post-images/jakeseo_me/880f3bc0-64c7-11e9-b2ea-0394058a2650/js-eventloop.png)
+> 코드 실행 중 내부에서 일어나는 일들
+
