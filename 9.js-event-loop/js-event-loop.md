@@ -58,3 +58,30 @@ main();
 
 > 그래서 setTimeout(function, delayTime)에 들어가는 delay 파라미터는 어떤 함수가 실행된 뒤의 정확한 시간 딜레이를 말하는 것이 아닙니다. delay 파라미터는 함수가 실행됐을 때의 어떤 지점이후의 최소 대기시간을 의미하는 것입니다.
 
+# 코드 2: 더 깊은 이해
+
+```js
+function main() {
+  console.log('A');
+  setTimeout(
+    function exec() { console.log('B'); }
+  , 0);
+  runWhileLoopForNSeconds(3);
+  console.log('C');
+}
+
+main();
+
+function runWhileLoopForNSeconds(sec) {
+  let start = Date.now(), now = start;
+  while (now - start < (sec*1000)) {
+    now = Date.now();  
+  }
+}
+
+// Output
+// A
+// C
+// B
+```
+
