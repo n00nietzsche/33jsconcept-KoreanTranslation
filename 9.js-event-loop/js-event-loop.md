@@ -88,3 +88,5 @@ function runWhileLoopForNSeconds(sec) {
 ![js eventloop2.png](https://images.velog.io/post-images/jakeseo_me/f8d80f00-65a1-11e9-891e-093443103677/js-eventloop2.png)
 
 - 함수 `runWhileLoopForNSeconds()`는 정확히 이름과 같은 일을 합니다. 함수가 호출된 시간에서 경과된 시간을 계속 측정하여 경과된 시간이 함수의 인자로 받은 시간과 일치하는지 계속해서 검증합니다. 기억해야할 메인포인트는 while 반복문이 콜스택에서 상주하면서 브라우저 API를 사용하지 못하게 하는 blocking statement라는 것입니다. 이 함수는 실행이 끝날 때까지 뒤에 오는 모든 statements들이 실행되지 못하게 막습니다.
+- 그래서 위의 코드에서, 비록 setTmeout은 0초의 딜레이를 가지고 while 반복문은 3초간 실행되더라도, exec() 콜백은 메시지 큐에 갇혀있습니다. while 반복문은 3초가 지날 때까지 콜스택 위에서 계속 실행됩니다. (js의 엔진은 싱글스레드니까요) 3초가 지나 콜스택이 비게 되는 순간에 exec() 콜백은 콜스택으로 들어와서 실행됩니다.
+- setTimeout()의 딜레이 인자는 실행이 시작되는 타이밍을 보장해주는 것이 아닙니다. 최소한 얼마정도는 있다가 실행되라 정도의 의미로 보는 것이 옳습니다.
