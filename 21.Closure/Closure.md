@@ -226,3 +226,9 @@ alert( counter() ); // 2
 내부 함수가 작동할 때, `count++` 안에 있는 변수는 안에서 밖으로 찾아집니다. 예를 들면 위의 예제에서 순서는 다음과 같습니다.
 
 ![lexical-search-order.png](https://images.velog.io/post-images/jakeseo_me/de532820-8b5a-11e9-aa43-c9541045e28f/lexical-search-order.png)
+
+1. 중첩된 함수의 지역 어휘 환경에 접근합니다.
+2. 외부 함수의 변수들에 접근합니다.
+3. 전역 변수에 닿을 때까지 계속하여 반복합니다.
+
+이 예제에서 `count`는 2번째 단계에서 발견됩니다. 외부 변수가 수정됐을 때, 외부 변수는 발견된 곳에서 변경됩니다. 그래서 `count++`는 외부 변수를 찾고 외부 변수를 증가시킵니다.
