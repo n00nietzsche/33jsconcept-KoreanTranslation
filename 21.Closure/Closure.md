@@ -98,3 +98,14 @@ sayHi(); // what will it show: "John" or "Pete"?
 
 아래의 코드는 어휘적(Lexical) 환경이 시작부터 비어있는 상태가 아니라는 것(non-empty)을 나타냅니다. 아래에서 어휘적(Lexical) 환경은 함수 `say`를 갖고 있습니다. 왜냐하면 `say`는 함수 선언이기 때문입니다. 그리고 이후에 어휘적 환경은 `let`으로 선언된 `phrase`를 갖게 됩니다.
 
+![lexical-environment-global-3.png](https://images.velog.io/post-images/jakeseo_me/59f849e0-8b1c-11e9-953c-41d6fbbdf251/lexical-environment-global-3.png)
+
+## 내부(Inner)와 외부(outer) 어휘(Lexical) 환경
+
+이제 함수가 외부의 변수에 접근할 때 무슨 일이 일어나는지 살펴봅시다.
+
+함수 호출 동안, `say()`는 외부 변수 `phrase`를 사용합니다. 어떤 일이 일어나는지 상세하게 살펴봅시다.
+
+먼저, 함수가 실행될 때, 새로운 함수 어휘 환경이 자동으로 만들어집니다. 모든 함수에 대한 일반적인 규칙입니다. 어휘적 환경은 지역 변수들과 함수 호출 시의 파라미터를 저장하기 위하여 사용됩니다.
+
+예를 들면 `say("John")`의 경우는, 
