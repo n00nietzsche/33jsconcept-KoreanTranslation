@@ -86,7 +86,7 @@ sayHi(); // what will it show: "John" or "Pete"?
 - 변수는 특별한 내부 오브젝트의 프로퍼티입니다. 특별한 내부 오브젝트는 현재 실행중인 블록/함수/스크립트와 연관되어 있습니다.
 - 변수들이 작동하는 것은 실제로 그 오브젝트의 프로퍼티들이 작동하는 것입니다.
 
-## 함수 선언
+### 함수 선언
 
 지금까지, 우리는 변수에 대해서만 알아봤습니다. 이제 함수 선언에 대해 알아봅시다.
 
@@ -100,7 +100,7 @@ sayHi(); // what will it show: "John" or "Pete"?
 
 ![lexical-environment-global-3.png](https://images.velog.io/post-images/jakeseo_me/59f849e0-8b1c-11e9-953c-41d6fbbdf251/lexical-environment-global-3.png)
 
-## 내부(Inner)와 외부(outer) 어휘(Lexical) 환경
+### 내부(Inner)와 외부(outer) 어휘(Lexical) 환경
 
 이제 함수가 외부의 변수에 접근할 때 무슨 일이 일어나는지 살펴봅시다.
 
@@ -159,5 +159,70 @@ sayHi(); // Pete
 
 > **하나의 호출에 하나의 어휘 환경 :** 반드시 알아둬야 할 것은 새로운 함수의 어휘 환경은 함수가 실행되는 각각의 시간마다 한번씩 만들어진다는 것입니다. 그리고 만일 함수가 여러번 호출되면, 각 호출이 그 호출을 위한 지역 변수들과 파라미터를 가진 자신만의 어휘 환경을 가질 것입니다.
 
-> **어휘 환경은 상술 객체(Specification Object)이다 :** "어휘 환경(Lexical Environment)"는 상술 객체입니다. 우리는 이 객체를 코드에서 가져올 수도 없고 직접 수정할 수도 없습니다. 자바스크립트 엔진은 아마 이 객체에 대한 최적화를 진행할 것입니다. 메모리를 아끼기 위해 사용되지 않는 변수를 제거하고 다른 내부적인 트릭도 사용할 것입니다. 하지만 보여지는 행위는 기술된대로 행할 것입니다.
+> **어휘 환경은 상술 객체(Specification Object)이다 :** "어휘 환경(Lexical Environment)"는 상술 객체입니다. 우리는 이 오브젝트를 코드에서 가져올 수도 없고 직접 수정할 수도 없습니다. 자바스크립트 엔진은 아마 이 객체에 대한 최적화를 진행할 것입니다. 메모리를 아끼기 위해 사용되지 않는 변수를 제거하고 다른 내부적인 트릭도 사용할 것입니다. 하지만 보여지는 행위는 기술된대로 행할 것입니다.
 
+## 중첩된 함수들
+
+함수가 다른 함수 내부에서 생성됐을 때, 우리는 이 함수를 "중첩된" 함수라고 부릅니다.
+
+중첩된 함수를 자바스크립트에서는 매우 쉽게 구현할 수 있습니다.
+
+우리는 우리의 코드를 정리하기 위해 중첩된 함수를 사용합니다. 다음과 같이요.
+
+```js
+function sayHiBye(firstName, lastName) {  
+  // helper nested function to use below
+  function getFullName() {
+    return firstName + " " + lastName;
+  }
+  
+  alert( "Hello, " + getFullName() );
+  alert( "Bye, " + getFullName() );
+}
+```
+
+여기에 *중첩된* 함수 `getFullName()`은 편의를 위해 만들어졌습니다. 이 함수는 외부의 변수에 접근할 수 있습니다. 그래서 fullName을 반환할 수 있습니다. 중첩된 함수는 자바스크립트에서는 꽤 일반적인 코드입니다.
+
+더욱 흥미로운 것은, 중첩된 함수가 반환될 수 있다는 것입니다: 하나의 새로운 오브젝트의 새로운 프로퍼티 (만일 외부 함수가 메소드와 함께 오브젝트를 만든다면) 또는 그 자체의 결과로 리턴 가능합니다. 위치는 상관없이, 중첩된 함수는 여전히 같은 외부 변수들에 대한 참조자를 가지고 있습니다.
+
+예를 들면, [생성자 함수](https://javascript.info/constructor-new)에 의해 중첩된 함수가 새로운 오브젝트에 할당되는 코드가 있습니다.
+
+```js
+// constructor function returns a new object
+function User(name) {
+
+  // the object method is created as a nested function
+  this.sayHi = function() {
+    alert(name);
+  };
+}
+
+let user = new User("John");
+user.sayHi(); // the method "sayHi" code has access to the outer "name"
+```
+
+그리고 여기에서 우리는 "counting" 함수를 만들고 반환합니다.
+
+```js
+function makeCounter() {
+  let counter = 0;
+  
+  return function() {
+    return count++;
+  };
+}
+
+let counter = makeCounter();
+
+alert( counter() ); // 0
+alert( counter() ); // 1
+alert( counter() ); // 2
+```
+
+`makeCounter` 예제에 대해 자세히 짚어볼까요? `makeCounter`는 매 호출 시에 다음 숫자를 반환하는 "counter" 함수를 만듭니다. 간단함에도 불구하고, 그 코드에서 약간의 수정된 변형들이 실용적인 사용 용례들을 갖고 있습니다. 예를 들면, 의사 난수 생성기와 다른 용도로서도 가능합니다. 
+
+어떻게 counter가 내부적으로 작동할까요?
+
+내부 함수가 작동할 때, `count++` 안에 있는 변수는 안에서 밖으로 찾아집니다. 예를 들면 위의 예제에서 순서는 다음과 같습니다.
+
+![lexical-search-order.png](https://images.velog.io/post-images/jakeseo_me/de532820-8b5a-11e9-aa43-c9541045e28f/lexical-search-order.png)
