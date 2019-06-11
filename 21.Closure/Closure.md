@@ -286,4 +286,36 @@ alert( counter2() ); // 0 (independent)
 
 여기, `makeCounter`가 전역 어휘 환경에서 만들어집니다. 그래서 `[[Environment]]`는 전역 어휘 환경에 대한 참조를 갖고 있습니다.
 
-다시 말해서, 함수가 
+다시 말해서, 함수는 함수가 생겨난 위치의 어휘 환경과 함께 찍혀나온다("imprinted")는 것입니다. 그리고 `[[Environment]]`는 그 참조를 가진 숨겨진 함수 프로퍼티입니다.
+
+2. 코드가 실행되고, 새로운 전역 변수인 `counter`가 선언되고, 값을 위해 `makeCounter()`가 호출됩니다. 여기에 `makeCounter()` 내부의 코드 첫째 줄 실행 순간 스냅샷이 있습니다. 
+
+![lexenv-nested-makecounter-2.png](https://images.velog.io/post-images/jakeseo_me/43c7e650-8c05-11e9-bbd3-37eb8635867b/lexenv-nested-makecounter-2.png)
+
+`makeCounter()`를 호출하는 순간에, 변수와 인자를 보관하기 위한 어휘 환경이 만들어집니다.
+
+모든 어휘 환경처럼, counter는 2가지를 저장합니다.
+
+1. 지역 변수를 저장하는 환경 레코드. 우리의 경우에는, `count`가 유일한 지역 변수입니다. (`let count`가 실행된 줄이 실행될 때를 생각해보면 그렇습니다.)
+
+2. 함수의 `[[Environment]]`로 세팅된 외부 어휘 참조. 여기에 `makeCounter`의 `[[Environment]]`가 전역 어휘 환경을 참조합니다.
+
+그래서 이제 우리는 두 개의 어휘 환경을 갖고 있습니다 : 첫번째 어휘 환경은 전역입니다. 두번째 어휘 환경은 현재의 전역으로의 외부 참조와 함께 `makeCounter` 호출을 위한 것입니다.
+
+3. `makeCounter()`의 실행 동안, 작은 중첩된 함수가 만들어집니다.
+
+함수가 만들어질 때, 함수 선언인지 함수 표현식인지는 중요하지 않습니다. 모든 함수는 그 함수들이 만들어진 어휘적 환경을 참조하는 `[[Environment]]` 프로퍼티를 갖습니다. 그래서 우리의 새로운 작은 중첩된 함수도 `[[Environment]]`를 갖습니다.
+
+우리의 새로운 중첩된 함수에 대해, `[[Environment]]`의 값은 `makeCounter()`의 현재의 어휘 환경 (함수가 만들어진 위치) 입니다.
+
+![lexenv-nested-makecounter-3.png](https://images.velog.io/post-images/jakeseo_me/12e2dd10-8c0a-11e9-bb25-4b9de18de654/lexenv-nested-makecounter-3.png)
+
+이 단계에서 내부 함수가 만들어졌었다는 것을 기억하세요. 하지만 아직 호출되지 않았습니다. `function() { return count ++; }` 내부의 코드는 아직 동작하지 않았습니다.
+
+4. 실행이 진행되며, `makeCounter()`로의 호출은 끝이납니다. 그리고 결과(작고 중첩된 함수)는 전역 변수 `counter`에 할당됩니다.
+
+![lexenv-nested-makecounter-4.png](https://images.velog.io/post-images/jakeseo_me/6c0158e0-8c0a-11e9-bb25-4b9de18de654/lexenv-nested-makecounter-4.png)
+
+그 함수는 오직 하나의 라인만 갖습니다. `return count++`, 우리가 이 함수를 실행시킬 때, 실행될 것입니다.
+
+5. 
