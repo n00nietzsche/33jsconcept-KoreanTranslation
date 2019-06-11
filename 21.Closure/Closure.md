@@ -249,3 +249,34 @@ alert( counter() ); // 2
 1. 방법이 존재하지 않습니다 : `count`는 지역 함수 변수입니다. 우리는 외부로부터 이 변수에 접근할 수 없습니다.
 2. `makeCounter()`로의 모든 호출에 대하여, 자체적인 `count`와 함께 새로운 어휘 환경이 만들어집니다. 그래서 결과적인 `counter` 함수는 독립적입니다.
 
+다음은 데모입니다:
+
+```js
+function makeCounter() {
+  let count = 0;
+  return function() {
+    return count++;
+  };
+}
+
+let counter1 = makeCounter();
+let counter2 = makeCounter();
+
+alert( counter1() ); // 0
+alert( counter1() ); // 1
+
+alert( counter2() ); // 0 (independent)
+```
+
+희망적으로 보았을 때, 외부 변수에 대한 상황은 이제 깔끔합니다. 대부분의 상황에서는, 이정도의 이해만 있으면 충분합니다. 간결성을 위해서 생략한 스펙에 대한 몇가지 디테일들이 있습니다. 그래서 다음 섹션에서는 우리는 더욱 디테일한 것들을 커버할 것입니다. 지금까지 배웠던 것들을 까먹지마세요.
+
+## 환경 자세히 보기
+
+여기서 `makeCounter`예제에서 일어나는 일들을 단계단계 살펴봅니다. 디테일하게 알고 싶다면 잘 따라오세요.
+
+추가적인 `[[Environment]]` 프로퍼티가 여기서 다뤄질 것이라는 것을 잘 알아두세요. 이전에는 간략하게만 설명하기 위해서 빼먹었던 부분입니다.
+
+1. 스크립트가 시작됐을 때는, 오직 전역 어휘 환경만이 존재했습니다.
+
+![lexenv-nested-makecounter-1.png](https://images.velog.io/post-images/jakeseo_me/4b1d8390-8bf3-11e9-b149-4faf97263e4b/lexenv-nested-makecounter-1.png)
+
