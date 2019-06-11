@@ -280,3 +280,10 @@ alert( counter2() ); // 0 (independent)
 
 ![lexenv-nested-makecounter-1.png](https://images.velog.io/post-images/jakeseo_me/4b1d8390-8bf3-11e9-b149-4faf97263e4b/lexenv-nested-makecounter-1.png)
 
+위 시작점에서는, 오직 `makeCounter` 함수만이 존재합니다. 왜냐하면 이건 함수 선언이기 때문입니다. 아직 실행되지 않았습니다.
+
+**모든 함수들은 "태어나는 순간(on birth)"에 함수 생성의 어휘 환경 참조를 가진 숨겨진 프로퍼티 `[[Environment]]`를 받습니다.** 우리는 아직 이것에 대해 이야기 한 적이 없지만, 이것은 함수가 어디에서 만들어졌는지 아는 이유입니다.
+
+여기, `makeCounter`가 전역 어휘 환경에서 만들어집니다. 그래서 `[[Environment]]`는 전역 어휘 환경에 대한 참조를 갖고 있습니다.
+
+다시 말해서, 함수가 
