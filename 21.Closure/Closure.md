@@ -333,3 +333,25 @@ alert( counter2() ); // 0 (independent)
 6. `counter()` 호출은 `count`의 값만 반환하는 것이 아니라 증가도 시킵니다. 이런 수정사항이 "그 공간에서" 일어난다는 것을 알아두셔야 합니다. `count`의 값은 정확히 그 변수가 발견된 환경 내부에서 수정됩니다. 
 
 ![lexenv-nested-makecounter-6.png](https://images.velog.io/post-images/jakeseo_me/8cc154a0-8cf4-11e9-8967-27a33d637eae/lexenv-nested-makecounter-6.png)
+
+결과적으로 우리는 유일한 변화였던 새로운 `count` 값을 지니고 이전 단계로 돌아옵니다. 뒤에 이어지는 호출들도 모두 같은 일을 합니다.
+
+7. 다음 `counter()`를 호출하고 같은 작업을 합니다.
+
+챕터를 시작하며 물어봤던, 두번째 질문의 답변이 이제는 꽤나 분명합니다.
+
+아래의 코드에서 `work()` 함수는 원래 장소로 부터 외부 어휘 환경 참조를 통하여 `name`을 사용합니다:
+
+![lexenv-nested-work.png](https://images.velog.io/post-images/jakeseo_me/60354210-8cf5-11e9-8967-27a33d637eae/lexenv-nested-work.png)
+
+그래서, 여기서 결과 값은 `"Pete"`가 나오게 됩니다.
+
+`makeWorker()` 함수 내부의 `let name`이 없었다면, 검색 과정에서 바깥 어휘 환경으로 진입하여 우리가 위의 체인에서 볼 수 있는 전역 변수를 들고 왔을 것입니다. 이번 경우에는 그 전역 변수는 `"John"` 입니다.
+
+> **Closures :** 일반적인 프로그래밍 용어 중 "Closure"가 있습니다. 개발자라면 알아두는 것이 좋습니다.
+
+> [closure](https://en.wikipedia.org/wiki/Closure_(computer_programming))는 외부의 변수를 기억하고 접근할 수 있는 함수입니다. 몇몇 언어에서는, 이러한 구현이 불가능합니다. 또한 이러한 일이 일어나게 하기 위해서는 함수를 특별한 방법으로 작성해야 합니다. 하지만 위에 기재된대로, 자바스크립트에서는, 모든 함수가 자연적으로 closure입니다. (다만 하나의 예외는 있는데, 나중에 다뤄질 것이지만 ["new Function" 문법(https://javascript.info/new-function)]이 있습니다.
+
+ >자바스크립트의 함수들은 자신이 생성된 위치를 숨겨진 `[[Environment]]` 프로퍼티를 이용하여 기억합니다. 그리고 그렇게 만들어진 모든 함수들은 외부 변수에 접근이 가능합니다.
+인터뷰를 할 때, 한 프론트엔드 개발자가 "closure란 무엇인가요?"라는 질문을 받았습니다. 유효한 정답은 closure의 정의를 설명하고 모든 자바스크립트에서의 함수가 클로져이며, 기술적인 디테일에 대해서 몇가지 추가적인 설명을 더 해주는 것입니다: `[[Environment]]` 프로퍼티와 어떻게 어휘 환경이 작동하는지에 대해서요.
+
