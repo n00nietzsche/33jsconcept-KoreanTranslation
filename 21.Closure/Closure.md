@@ -318,4 +318,18 @@ alert( counter2() ); // 0 (independent)
 
 그 함수는 오직 하나의 라인만 갖습니다. `return count++`, 우리가 이 함수를 실행시킬 때, 실행될 것입니다.
 
-5. 
+5. `counter()`가 호출됐을 때, 함수 호출을 위한 "빈(empty)" 어휘 환경이 만들어집니다. 이 어휘 환경은 그 자체로 어떤 지역 변수도 가지고 있지 않습니다. 하지만 `counter`의 `[[Environment]]`는 이 어휘 환경의 외부 참조로서 사용됩니다. 그래서 이 어휘 환경은 이전 `makeCounter()` 호출의 변수에 접근할 수 있습니다.
+
+![lexenv-nested-makecounter-5.png](https://images.velog.io/post-images/jakeseo_me/3c549af0-8cf3-11e9-bbde-c38131c8b066/lexenv-nested-makecounter-5.png)
+
+지금, 만일 이 어휘 환경이 변수에 접근한다면, 처음에는 비어있는 자기 자신의 어휘 환경부터 뒤질 것입니다. 그 후에는 이전의 `makeCounter()` 호출의 어휘 환경을 뒤지고 그 이후에는 전역 어휘 환경을 뒤집니다.
+
+이 어휘 환경이 `count`를 찾을 때, 이 어휘 환경은 가장 가까운 외부 어휘 환경인 `makeCounter`의 변수 사이에서 `counter`를 발견할 것입니다.
+
+여러분들이 알아둬야 할 것은 여기서 메모리 관리가 어떻게 동작하는지 입니다. `makeCounter()` 호출이 얼마 전에 끝났음에도 불구하고, 어휘 환경은 그대로 메모리에 보관되어 있습니다. 왜냐하면 그 어휘 환경을 참조하는 `[[Environment]]`를 가진 중첩 함수가 존재하기 때문입니다.
+
+일반적으로, 하나의 어휘 환경 오브젝트는 어떤 함수가 그 어휘 환경을 사용하는 한 계속하여 살아있습니다. (메모리에서 지워지지 않습니다.) 오직 그 어휘 환경을 사용하는 함수가 존재하지 않을 때에만 메모리에서 지워집니다.
+
+6. `counter()` 호출은 `count`의 값만 반환하는 것이 아니라 증가도 시킵니다. 이런 수정사항이 "그 공간에서" 일어난다는 것을 알아두셔야 합니다. `count`의 값은 정확히 그 변수가 발견된 환경 내부에서 수정됩니다. 
+
+![lexenv-nested-makecounter-6.png](https://images.velog.io/post-images/jakeseo_me/8cc154a0-8cf4-11e9-8967-27a33d637eae/lexenv-nested-makecounter-6.png)
