@@ -555,3 +555,171 @@ g = null; // 이젠 메모리에서 사라짐
 
 아래의 코드가 멈췄을 때, 콘솔에서 `alert(value)`를 타이핑해보세요.
 
+```js
+function f() {
+  let value = Math.random();
+
+  function g() {
+    debugger; // in console: type alert( value ); No such variable!
+  }
+
+  return g;
+}
+
+let g = f();
+g();
+```
+
+여러분도 볼 수 있듯, 그러한 변수가 존재하지 않습니다! 이론상으로는, 접근이 가능해야 하는데 엔진이 최적화를 진행해버렸습니다.
+
+이러한 현상은 재미있는 (만일 그렇게 시간이 소비되지 않는다면) 디버깅 이슈를 초래할 수 있습니다. 그들 중 우리가 예측한 것 대신에 같은 이름의 외부 변수를 볼 수 있습니다.
+
+```js
+let value = "Surprise!";
+
+function f() {
+  let value = "the closest value";
+
+  function g() {
+    debugger; // in console: type alert( value ); Surprise!
+  }
+
+  return g;
+}
+
+let g = f();
+g();
+```
+
+> **나중에 봅시다!** 이러한 V8의 특징은 알아놓으면 좋습니다. 만일 여러분이 Chrome/Opera를 이용해 디버깅한다면, 빠르던 늦던 언젠가 알게 될 특성이었습니다. 이것은 디버거의 버그가 아닙니다. 오히려 V8의 특별한 기능입니다. 아마 언젠가 이러한 기능이 수정될 것입니다. 여러분은 언제나 이 페이지의 예제를 돌려보며 체크해 볼 수 있습니다.
+
+# 과제
+
+## 카운터는 독립적일까?
+> 중요도 : 5
+
+여기에 우리는 두개의 카운터를 만듭니다: 같은 `makeCounter`함수를 이용한 `counter`와 `counter2` 입니다.
+
+이 두개는 독립적일까요? 두번째 카운터는 무엇을 보여줄까요? `0,1` 또는 `2,3` 또는 다른 것을 보여줄까요?
+
+```js
+function makeCounter() {
+  let count = 0;
+  
+  return function() {
+    return count++;
+  };
+}
+
+let counter = makeCounter();
+let counter2 = makeCounter();
+
+alert( counter() ); // 0
+alert( counter() ); // 1
+
+alert( counter2() ); // ?
+alert( counter2() ); // ?
+```
+
+> 정답은 : **0, 1** 입니다. 함수 `counter` 그리고 `counter2`는 `makeCounter`의 다른 호출에 의해 생성되었습니다. 그래서 그들은 독립적인 외부 어휘 환경을 갖고 있습니다. 각각은 자신의 `count`를 가지고 있습니다.
+
+## 카운터 객체
+> 중요도 : 5
+
+여기에 카운터 객체가 생성자 함수의 도움을 통해 만들어져 있습니다.
+
+이게 동작 할까요? 어떻게 보여질까요?
+
+```js
+function Counter() {
+  let count = 0;
+  this.up = function() {
+    return ++count;
+  };
+  this.down = function() {
+    return --count;
+  };
+}
+
+let counter = new Counter();
+
+alert(counter.up()); // ?
+alert(counter.up()); // ?
+alert(counter.down()); // ?
+```
+
+> 정답은 : 당연히 제대로 작동합니다. 두 개의 중첩된 함수들은 같은 외부 어휘 환경 내부에서 만들어졌습니다. 그래서 그들은 같은 `count` 변수를 공유합니다. 1, 2, 1을 차례로 alert합니다.
+
+## if 내부에 들어있는 함수
+
+코드를 보세요. 마지막 줄의 호출 결과는 무엇이 될까요?
+
+```js
+let phrase = "Hello";
+
+if (true) {
+  let user = "John";
+  
+  function sayHi() {
+    alert(`${phrase}, ${user}`);
+  }
+}
+
+sayHi() // 마지막 줄
+```
+
+> 정답은 : **에러** 입니다. 함수 `sayHi`는 `if` 내부에 선언되어 있습니다. 그래서 블럭 내부에서만 살아있습니다. 외부에는 `sayHi`가 존재하지 않습니다.
+
+## 클로져가 있는 Sum
+> 중요도: 4
+
+`sum(a)(b) = a+b`와 같은 결과를 반환하는 `sum`을 작성하세요.
+
+네, 두 개의 괄호를 이용해보세요. (오타가 아닙니다)
+
+예를 들면
+```
+sum(1)(2) = 3;
+sum(5)(-1) = 4;
+```
+
+> 정답은 : 
+
+```js
+function sum(a) {
+  return function sum2(b) {
+    return a+b;
+  }
+}
+```
+
+입니다. 
+
+## 함수로 필터링하기
+> 중요도: 5
+
+우리는 배열을 위한 `arr.filter(f)` 빌트인 메소드를 갖고 있습니다. 이 메소드는 모든 요소를 함수 `f`를 이용하여 필터링합니다. 만일 이 메소드가 `true`를 반환하면, 그 엘리먼트는 결과 배열에 포함됩니다.
+
+"사용할 준비가 된" 필터의 셋을 만듭시다:
+
+- `inBetween(a, b)` - `a`와 `b` 사이 또는 두 개의 값과 같은 경우.
+- `inArray([...])` - 주어진 배열 내부.
+
+사용 용례는 다음과 같습니다.
+
+- `arr.filter(inBetween(3,6))` - 3과 6사이의 값만 선택
+- `arr.filter(inArray([1, 2, 3]))` - `[1, 2, 3]`의 멤버 중 매칭되는 것만 선택
+
+예를 들면: 
+
+```js
+/* 여기에 inBetween과 inArray를 작성하세요 */
+
+let arr = [1, 2, 3, 4, 5, 6, 7];
+
+alert( arr.filter(inBetween(3, 6)) ); // 3, 4, 5, 6
+alert( arr.filter(inArray([1, 2, 10])) ); // 1, 2
+```
+
+> 정답은 :
+
