@@ -369,3 +369,120 @@ alert( counter2() ); // 0 (independent)
 
 실행 컨텍스트가 `if` 블럭 안으로 들어갈 때, 블럭을 위한 새로운 "if-only" 어휘 환경이 만들어집니다.
 
+이 어휘 환경은 외부 어휘 환경으로의 참조를 갖고 있습니다. 그래서 `phrase`를 찾을 수 있습니다. 하지만 if문 내부에 선언된 모든 변수와 함수 표현식들은 그 어휘 환경 내부에 존재합니다. 그리고 바깥에서 접근될 수 없습니다.
+
+예를 들면, `if`가 끝난 이후, `alert` 아래에서 `user`에 접근하면, 그래서 에러가 납니다.
+
+
+### For, while
+
+For 루프 문은 모든 반복이 독립된 어휘 환경을 지닙니다. 만일, 변수가 `for` 내부에서 선언됐다면 그 변수 또한 어휘 환경의 지역 변수입니다.
+
+```js
+for (let i=0; i<10; i++) {
+  // 각각의 루프가 자신의 어휘 환경을 가짐
+  // {i: value}
+}
+
+alert(i); // Error, no such variable
+```
+
+알아둬야 할 것 : `let i`는 시각적으로는 `{...}` 외부에 있습니다. `for` 생성은 여기서 다소 특별합니다: 각 루프의 반복(iteration)이 `i`를 내부에 지닌 자신의 어휘 환경을 갖는다는 것입니다.
+
+다시, `if`와 비슷하게 루프 이후에는 `i`에 접근이 불가능합니다.
+
+### 코드 블럭들
+
+우리는 변수를 "지역 스코프"로 독립시키기 위해서 코드블럭을 사용할 수도 있습니다.
+
+예를 들면, 웹 브라우저에서, 모든 스크립트 (`type="module"`을 제외한)가 같은 전역 영역을 공유합니다. 그래서 우리가 만일 한 스크립트 내부에서 전역 변수를 만들면, 이 전역 변수는 다른 스코프에서도 접근 가능합니다. 하지만 만일 두 스크립트가 같은 변수 이름을 사용하고 서로를 덮어씌운다면, 전역 변수는 충돌의 원인이 됩니다.
+
+변수 이름이 널리 알려진 단어이고 스크립트 작성자들이 서로에 대해 알지 못한다면 이러한 일이 발생할 수 있습니다.
+
+만일 우리가 이러한 문제를 피하고 싶다면, 전체 스크립트 또는 일부를 독립시키기 위해서 우리는 코드블럭을 사용할 수 있습니다.
+
+```js
+{
+  // do some job with local variables that should not be seen outside
+
+  let message = "Hello";
+
+  alert(message); // Hello
+}
+
+alert(message); // Error: message is not defined
+```
+
+블럭 바깥의 코드(또는 다른 스크립트 내부의 코드)는 블럭 내부의 코드를 볼 수 없습니다. 왜냐하면 그 블럭은 자신만의 어휘 환경을 가졌기 때문입니다.
+
+### IIFE
+
+과거에는, 블럭-레벨 어휘 환경이란 것이 자바스크립트에 존재하지 않았습니다.
+
+그래서 프로그래머들은 무언가를 발명해야 했습니다. 그리고 그들이 발명한 것은 "즉시 호출되는 함수 표현식(Immediately-Invoked Function Expression)인 IIFE입니다.
+
+IIFE는 이제 우리가 반드시 써야하는 것은 아닙니다. 하지만 오래된 코드에서 IIFE를 찾아볼 수 있습니다. 그래니 이해하고 넘어가면 좋습니다.
+
+IIFE는 다음과 같은 형태를 띕니다.
+
+```js
+(function() {
+
+  let message = "Hello";
+
+  alert(message); // Hello
+
+})();
+```
+
+여기 함수 표현식이 만들어졌고 즉시 호출됩니다. 그래서 코드는 즉시 실행되고 자신의 private 변수들을 지닙니다.
+
+함수 표현식은 괄호로 둘러싸여 있습니다. `(function {...})`, 왜냐하면 자바스크립트가 메인 코드 흐름에서 `"function"`을 만났을 때, 자바스크립트는 이것을 함수 선언의 시작으로 이해합니다. 하지만 함수 선언은 이름을 가져야 합니다. 그래서 아래의 코드는 에러를 방출합니다.
+
+```js
+// Try to declare and immediately call a function
+function() { // <-- Error: Unexpected token (
+
+  let message = "Hello";
+
+  alert(message); // Hello
+
+}();
+```
+
+우리가 "괜찮아, 이름을 정의하면 되지" 라고 말한다고 해도, 여전히 작동하지 않습니다. 자바스크립트는 함수 선언이 즉시 호출되는 것을 허락하지 않습니다.
+
+```js
+// syntax error because of parentheses below
+function go() {
+
+}(); // <-- can't call Function Declaration immediately
+```
+
+그래서, 함수 주변에 괄호들을 붙이는 것은 함수가 다른 표현식의 컨텍스트에 만들어지는 것을 자바스크립트에게 보여주기 위한 트릭입니다. 그래서 이것은 함수 표현식이 됩니다. 이 함수 표현식은 이름도 필요 없고 즉시 불려질 수 있습니다.
+
+괄호 말고도 자바스크립트에게 우리가 함수 표현식을 쓰려고 했던 것이라고 말할 수 있는 다른 방법들도 있습니다.
+
+```js
+// IIFE 만드는 방법
+(function() {
+  alert("Parentheses around the function");
+})();
+
+(function() {
+  alert("Parenthjeses around the whole thing");
+})();
+
+!function() {
+  alert("Bitwise NOT operator starts the expression");
+}();
+
++function() {
+  alert("Unary plus starts the expression");
+}();
+```
+
+위의 경우들에서, 우리는 함수 표현식을 선언하고 즉시 실행합니다.
+
+## 가비지 컬렉션
+
