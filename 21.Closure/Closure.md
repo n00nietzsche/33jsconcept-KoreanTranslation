@@ -696,6 +696,7 @@ function sum(a) {
 입니다. 
 
 ## 함수로 필터링하기
+
 > 중요도: 5
 
 우리는 배열을 위한 `arr.filter(f)` 빌트인 메소드를 갖고 있습니다. 이 메소드는 모든 요소를 함수 `f`를 이용하여 필터링합니다. 만일 이 메소드가 `true`를 반환하면, 그 엘리먼트는 결과 배열에 포함됩니다.
@@ -723,7 +724,7 @@ alert( arr.filter(inArray([1, 2, 10])) ); // 1, 2
 
 > 정답은 :
 
-> inBetween
+inBetween
 
 ```js
 function inBetween(a, b) {
@@ -736,7 +737,7 @@ let arr = [1, 2, 3, 4, 5, 6, 7];
 alert( arr.filter(inBetween(3, 6)) ); // 3,4,5,6
 ```
 
-> inArray
+inArray
 
 ```js
 function inArray(arr) {
@@ -751,15 +752,165 @@ alert( arr.filter(inArray([1, 2, 10])) ); // 1,2
 
 > 참고) 번역자 작성 버전 (화살표 함수 사용)
 
-> inBetween
+inBetween
 
 ```js
 let inBetween = (a, b) => ((e) => (e >= a) && (e <= b));
 ```
 
-> inArray
+inArray
 
 ```js
 let inArray = (arr) => ((e) => (arr.indexOf(e) !== -1));
 ```
 
+## 필드로 정렬하기
+> 중요도 : 5
+
+우리는 정렬할 오브젝트의 배열을 갖고 있습니다.
+
+```js
+let users = [
+  { name: "John", age: 20, surname: "Johnson" },
+  { name: "Pete", age: 18, surname: "Peterson" },
+  { name: "Ann", age: 19, surname: "Hathaway" }
+];
+```
+
+일반적인 방법은 다음과 같습니다.
+
+```js
+// by name (Ann, John, Pete)
+users.sort((a, b) => a.name > b.name ? 1 : -1);
+
+// by age (Pete, Ann, John)
+users.sort((a, b) => a.age > b.age ? 1 : -1);
+```
+
+난잡하지 않게 다음과 같은 방법으로 풀 수 있을까요?
+
+```js
+users.sort(byField('name'));
+users.sort(byField('age'));
+```
+
+함수를 작성하는 대신에, 그냥 `byField(fieldName)`을 넣어보세요.
+
+위에서 사용된 `byField`를 직접 작성해보세요.
+
+> 정답은 :
+
+```js
+let users = [
+  { name: "John", age: 20, surname: "Johnson" },
+  { name: "Pete", age: 18, surname: "Peterson" },
+  { name: "Ann", age: 19, surname: "Hathaway" }
+];
+
+function byField(field) {
+  return (a, b) => a[field] > b[field] ? 1 : -1;
+}
+
+users.sort(byField('name'));
+users.forEach(user => alert(user.name)); // Ann, John, Pete
+
+users.sort(byField('age'));
+users.forEach(user => alert(user.name)); // Pete, Ann, John
+```
+
+> 참고) 번역자의 정답 (화살표 함수 사용)
+
+```js
+let byField = (eName) => ((a, b) => a[eName] > b[eName] ? 1 : -1)
+```
+
+## 화살표 함수
+> 중요도 : 5
+
+아래의 코드는 `shooters`의 배열을 생성합니다.
+
+모든 함수는 숫자 출력을 하도록 되어있습니다. 하지만 무언가 잘못됐습니다.
+
+```js
+function makeArmy() {
+  let shooters = [];
+
+  let i = 0;
+  while (i < 10) {
+    let shooter = function() { // shooter 함수
+      alert( i ); // 자신의 숫자를 보여주어야 합니다.
+    };
+    shooters.push(shooter);
+    i++;
+  }
+
+  return shooters;
+}
+
+let army = makeArmy();
+
+army[0](); // 0번 배열은 0을 보여줘야 하는데 10을 보여줍니다.
+army[5](); // 5번 배열도 10을 보여줍니다.
+// ... 모든 배열이 10을 보여줍니다.
+```
+
+왜 모든 shooter가 10을 보여주는 것일까요? 우리가 의도한대로 작동하도록 코드를 고쳐봅시다.
+
+`makeArmy`의 내부에서 어떤 일이 일어나는지 검사해보봅시다. 그러면 정답이 분명해질 것입니다.
+
+1. 처음에는 빈 배열 `shooters`를 만들어냅니다.
+
+```js
+let shooters = [];
+```
+
+2. 루프 내부에서 `shooters.push(function...)`을 통하여 배열을 채웁니다.
+
+모든 엘리먼트는 함수입니다. 결과 배열은 다음과 같이 생겼습니다.
+
+```js
+shooters = [
+  function () { alert(i); },
+  function () { alert(i); },
+  function () { alert(i); },
+  function () { alert(i); },
+  function () { alert(i); },
+  function () { alert(i); },
+  function () { alert(i); },
+  function () { alert(i); },
+  function () { alert(i); },
+  function () { alert(i); }
+];
+```
+
+3. 배열이 함수로부터 반환됩니다.
+
+이후에 `army[5]()`의 호출이 `army[5]` 함수 엘리먼트를 배열로부터 가져와서 호출합니다.
+
+이제 왜 모든 함수들이 같은 결과를 보이는지 알아봅시다.
+
+그것은 `shooter` 함수 어휘 환경 내부에 `i`라는 변수가 없기 때문입니다. 함수가 호출되었을 때, 함수는 `i`를 외부 어휘 환경으로부터 가져오게됩니다.
+
+`i`의 값은 무엇이 될까요?
+
+소스를 보게 된다면 : 
+
+```js
+function makeArmy() {
+  ...
+  let i = 0;
+  while (i < 10) {
+    let shooter = function() { // shooter function
+      alert( i ); // should show its number
+    };
+    ...
+  }
+  ...
+}
+```
+
+... 우리는 `i`가 현재 동작하는 `makeArmy()`와 관련된 어휘 환경에서 존재한다는 것을 볼 수 있습니다. 하지만 `army[5]()`가 호출됐을 때, `makeArmy`는 이미 작업을 끝냈습니다. 그리고 `i`는 마지막 값인 `10`을 갖고 있습니다.
+
+결과적으로, 모든 `shooter` 함수는 외부 어휘 환경으로 부터 `i=10`이라는 같은 값을 가져오게 됩니다.
+
+우리는 변수 선언부를 루프 안에 둠으로써 고칠 수 있습니다.
