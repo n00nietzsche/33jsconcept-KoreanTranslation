@@ -723,3 +723,43 @@ alert( arr.filter(inArray([1, 2, 10])) ); // 1, 2
 
 > 정답은 :
 
+> inBetween
+
+```js
+function inBetween(a, b) {
+  return function(x) {
+    return x >= a && x <= b;
+  };
+}
+
+let arr = [1, 2, 3, 4, 5, 6, 7];
+alert( arr.filter(inBetween(3, 6)) ); // 3,4,5,6
+```
+
+> inArray
+
+```js
+function inArray(arr) {
+  return function(x) {
+    return arr.includes(x);
+  };
+}
+
+let arr = [1, 2, 3, 4, 5, 6, 7];
+alert( arr.filter(inArray([1, 2, 10])) ); // 1,2
+```
+
+> 참고) 번역자 작성 버전 (화살표 함수 사용)
+
+> inBetween
+
+```js
+let inBetween = (a, b) => ((e) => (e >= a) && (e <= b));
+```
+
+> inArray
+
+```js
+let inArray = (arr) => ((e) => (arr.indexOf(e) !== -1));
+```
+
