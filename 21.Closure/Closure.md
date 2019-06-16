@@ -914,3 +914,61 @@ function makeArmy() {
 결과적으로, 모든 `shooter` 함수는 외부 어휘 환경으로 부터 `i=10`이라는 같은 값을 가져오게 됩니다.
 
 우리는 변수 선언부를 루프 안에 둠으로써 고칠 수 있습니다.
+
+```js
+function makeArmy() {
+
+  let shooters = [];
+
+  for(let i = 0; i < 10; i++) {
+    let shooter = function() { // shooter function
+      alert( i ); // should show its number
+    };
+    shooters.push(shooter);
+  }
+
+  return shooters;
+}
+
+let army = makeArmy();
+
+army[0](); // 0
+army[5](); // 5
+```
+
+이제 알맞게 작동합니다. `for (let i=0...) {...}`내부의 코드블럭이 실행될 때마다, 상응하는 변수 `i`와 함께 코드블럭을 위한 새로운 어휘 환경이 생성됩니다. 
+
+그래서, `i`의 값은 이제 조금 더 가까이 존재하게 됩니다. `makeArmy()` 어휘 환경 내부가 아니라, 현재의 루프 반복에 상응하는 어휘 환경 내부에 존재합니다. 그게 코드가 이젠 정상적으로 작동하는 이유입니다.
+
+![lexenv-makearmy.png](https://images.velog.io/post-images/jakeseo_me/dea7fb10-908d-11e9-a381-cdb19866bede/lexenv-makearmy.png)
+
+이제 우리는 `for` 대신 다시 `while`문을 작성해볼 것입니다.
+
+다른 트릭도 가능합니다. 주제를 더 잘 이해하기 위해서 다음 소스를 봅시다.
+
+```js
+function makeArmy() {
+  let shooters = [];
+
+  let i = 0;
+  while (i < 10) {
+    let j = i;
+    let shooter = function() { // shooter function
+      alert( j ); // should show its number
+    };
+    shooters.push(shooter);
+    i++;
+  }
+
+  return shooters;
+}
+
+let army = makeArmy();
+
+army[0](); // 0
+army[5](); // 5
+```
+
+`for`와 같은 `while` 루프가 각각 실행에 대한 새로운 어휘 환경을 만듭니다. 그래서 우리는 이 소스에서 `shooter`를 위한 알맞은 값을 가져온다는 것을 알 수 있습니다.
+
+우리는 `let j = i`를 복사합니다. 이 한 줄은 루프 내부에 `j`라는 지역 변수를 만들고 `i`의 값을 `j` 내부에 삽입합니다. 원시값(Primitives)은 값에 의한(by value) 복사가 일어납니다. 그래서 우리는 각 반복에 속하는 실제로 완전히 독립적인 `i`의 복사본을 가질 수 있는 것입니다.
