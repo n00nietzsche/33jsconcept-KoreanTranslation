@@ -9,4 +9,6 @@
 	- https://velog.io/@jakeseo_me
 	- https://github.com/n00nietzsche
 
-> 자바스크립트 개발자라면 알아야 할 33가지 개념 #22 자바스크립트 : High Order Function 이해하기
+> 자바스크립트 개발자라면 알아야 할 33가지 개념 #22 자바스크립트 : 자바스크립트 내부 Higher Order Function 이해하기
+
+High
