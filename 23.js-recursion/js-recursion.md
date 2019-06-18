@@ -80,3 +80,73 @@ factorial(3);
 
 ## 팩토리얼 함수 흐름
 
+우리가 팩토리얼 함수를 호출했을 때 정확히 어떤 일들이 벌어지는지 다시 한번 체크해봅시다.
+
+1. 우리는 숫자 3을 넘겨서 함수를 호출합니다.
+
+```js
+factorial(3);
+```
+
+2. 함수가 동작하게 됩니다. if문을 넘어가고 재귀 부분을 실행합니다. 정수 3과 `factorial(3-1)`이 곱해진 결과를 반환합니다.
+
+```js
+return 3 * factorial(2);
+```
+
+3. `factorial(2)`가 동작할 때, if을 다시 넘어가고 재귀가 일어납니다. 정수 2와 `factorial(2-1)`이 곱해진 결과를 반환합니다.
+
+```js
+return 2 * factorial(1);
+```
+
+4. `factorial(1)`이 동작할 때, if문이 또 한번 넘어가게 되고 재귀가 일어납니다. 정수 1과 `factorial(1-1)`이 곱해진 결과를 반환합니다.
+
+```js
+return 1 * factorial(0);
+```
+
+5. `factorial(0)`이 동작할 때, 뭔가 다른 일이 일어납니다. 0은 우리의 기반 조건입니다. 그래서 if문에 걸려 함수는 1을 반환합니다.
+
+```js
+if(x === 0) return 1;
+```
+
+**이제 함수가 마침내 리턴을 마쳤습니다. 궁금했던 모든 것들이 풀렸을 것입니다. 재귀는 단순히 중첩된 함수 호출이기 때문입니다. 모든 중첩된 함수에서 가장 내부에 중첩된 함수가 가장 먼저 반환됩니다.**
+
+> 이 부분을 이해하는 것은 매우 중요합니다. 처음 보자마자 이해가 되지 않았다면, 이 부분을 몇번 읽어보세요.
+
+`factorial(0)` 는 `1`
+
+`factorial(1)` 는 `1 * factorial(0)`, 또는 `1*1`
+
+`factorial(2)` 는 `2 * factorial(1)`, 또는 `2*1*1`
+
+`factorial(3)` 는 `3` * `factorial(2)`, 또는 `3*2*1*1`
+
+```js
+return 1 * 1 * 2 * 3
+// 6
+```
+
+**잘 따라 오셨나요? 같은 구조로 되어 있는 다른 예제입니다.**
+
+```js
+factorial(3) returns 3 * factorial(2)
+factorial(2) returns 2 * factorial(1)
+factorial(1) returns 1 * factorial(0)
+factorial(0) returns 1
+// 여기서 기반 조건이 충족됩니다. 재귀 함수는 안에서 부터 바깥으로 값을 반환해나갑니다.
+factorial(0) returns 1                 => 1
+factorial(1) returns 1 * factorial(0)  => 1 * 1
+factorial(2) returns 2 * factorial(1)  => 2 * 1 * 1
+factorial(3) returns 3 * factorial(2)  => 3 * 2 * 1 * 1
+// 3 * 2 * 1 * 1 = 6
+```
+
+여전히 잘 이해가 되지 않더라도 괜찮습니다. 이제 다른 예제를 구경해보고 헷갈렸던 부분들을 말끔히 해봅시다.
+
+. . .
+
+## 두번째 예제를 봅시다
+
