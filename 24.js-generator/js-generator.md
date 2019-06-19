@@ -40,6 +40,8 @@ const myFavouriteAuthors = [
 ![custom_data.png](https://images.velog.io/post-images/jakeseo_me/d4bf20f0-922d-11e9-86db-31f8b943b3f7/customdata.png)
 > Custom Data Structure
 
+이제, `myFavouriteAuthors`는 또 다른 객체인 `allAuthors`를 가진 객체입니다. `allAuthors`는 `fiction`, `scienceFiction`, `fantasy` 라는 키를 가진 3개의 배열로 이루어져 있습니다. **지금 여러분에게 모든 작가 정보를 가져오기 위해서 `myFavouriteAuthors`에 대한 루프를 돌아보라고 하면, 여러분의 접근법은 어떻게 될까요?** 모든 데이터를 가져오기 위해서 반복을 조합하려 할 것입니다.
+
 
 
 ## Generator
