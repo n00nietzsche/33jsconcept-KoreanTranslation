@@ -42,7 +42,31 @@ const myFavouriteAuthors = [
 
 이제, `myFavouriteAuthors`는 또 다른 객체인 `allAuthors`를 가진 객체입니다. `allAuthors`는 `fiction`, `scienceFiction`, `fantasy` 라는 키를 가진 3개의 배열로 이루어져 있습니다. **지금 여러분에게 모든 작가 정보를 가져오기 위해서 `myFavouriteAuthors`에 대한 루프를 돌아보라고 하면, 여러분의 접근법은 어떻게 될까요?** 모든 데이터를 가져오기 위해서 반복을 조합하려 할 것입니다.
 
+만일, 이전처럼 하려고 한다면...
 
+```js
+for (let author of myFavouriteAuthors) {
+  console.log(author);
+}
+
+// 타입 에러: {} 는 반복할 수 없습니다.
+```
+
+여러분은 객체(Object)를 *반복할 수 없다(not iterable)*는 `TypeError`를 만나게 될 것입니다. **반복할 수 있다는 것(Iterable)이 어떤 의미인지 살펴보고 어떻게 객체(Object)를 반복할 수 있게 만들 수 있는지 알아봅시다.** 이 글 마지막에서, 여러분은 `for-of` 루프를 사용자 정의 객체에 어떻게 적용하는지 알게될 것입니다. 그리고 이제 `myFavouriteAuthors`를 반복 가능(Iterable)하게 만들어봅시다.
+
+### 반복 가능한 것(Iterable)과 Iterator
+
+이전 섹션에서 우리에게 어떤 문제가 발생했는지는 알았을 것입니다. 사용자 정의 객체에서 'author'에 들어있는 목록들을 가져올 수 있는 쉬운 방법이 없었습니다. 내부 데이터를 차례로 밖으로 노출시키는 방법을 통한 어떤 메소드를 원합니다. 
+
+메소드 `myFavouriteAuthors` 내부에 `getAllAuthors` 메소드를 추가해봅시다. 이 메소드는 모든 author를 반환할 것입니다. 다음과 같이요.
+
+![getAllAuthors.png](https://images.velog.io/post-images/jakeseo_me/9b3ddee0-932f-11e9-8bae-714c47bf13a6/getAllAuthors.png)
+> getAllAuthors 구현
+
+위에 나온 구현 방법은 정말 간단한 접근법입니다. 모든 author를 가져오긴 합니다. 하지만, 아직 몇가지 문제들이 이 구현된 코드 속에 남아있습니다. 몇가지는 다음과 같습니다.
+
+- `getAllAuthors`는 매우 제한적입니다. 만일 어떤 사람이 `myFavouriteAuthors`를 만든다면, 그 사람은 이 메소드의 이름을 `retrieveAllAuthors`로 바꿀 것입니다.
+- 
 
 ## Generator
 
