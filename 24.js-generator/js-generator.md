@@ -120,6 +120,31 @@ for (let author of myFavouriteAuthors) {
 
 - `for-of` 반복 - `for-of` 반복은 반복 가능한 것을 필요로 합니다. 반복이 불가능하다면, `for-of`는 `TypeError`를 던질 것입니다.
 
+```js
+for (const value of iterable) { ... }
+```
+
+- **배열의 비구조화** - 비구조화는 반복 가능(iterable)하기에 일어납니다. 정확히 어떤 일이 일어나는지 살펴봅시다.
+
+```js
+const array = ['a', 'b', 'c', 'd', 'e'];
+const [first, ,third, ,last] = array;
+```
+
+위의 코드는
+
+```js
+const array = ['a', 'b', 'c', 'd', 'e'];
+const iterator = array[Symbol.iterator]();
+const first = iterator.next().value
+iterator.next().value // Since it was skipped, so it's not assigned
+const third = iterator.next().value
+iterator.next().value // Since it was skipped, so it's not assigned
+const last = iterator.next().value
+```
+
+
+
 ## Generator
 
 ES6는 **Generator (또는 Generator 함수)** 형태에서 함수와 Iterator를 다루는 방법을 새롭게 소개했습니다. 제너레이터는 함수를 **중간에서** 멈추고, *다시 멈췄던 부분부터* 실행할 수 있게 합니다. **요약하면, Generator는 함수의 형태를 띄지만, Iterator처럼 동작합니다.**
