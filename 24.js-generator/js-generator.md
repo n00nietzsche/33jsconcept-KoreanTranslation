@@ -92,6 +92,34 @@ for (let author of myFavouriteAuthors) {
 - **iterable**은 자신의 원소들이 외부에서 접근 가능하도록 만들길 원하는 자료 구조입니다. 키가 `Symbol.iterator`인 메소드를 구현함으로써 원소들이 외부에서 접근 가능하도록 만듭니다. `Symbol.iterator` 메소드는 **iterator**를 위한 공장이라고 보면 됩니다. **iterator**들을 만들어냅니다.
 - **iterator**는 자료 구조의 원소들을 순회할 수 있는 포인터입니다.
 
+### 오브젝트를 반복 가능(iterable)하게 만들어보기
+
+이전 섹션에서 배웠듯이, 우리는 `Symbol.iterator` 라 불리는 메소드를 구현할 필요가 있습니다. [computed property 문법](http://es6-features.org/#ComputedPropertyNames)을 이용하여 키를 설정해봅시다. 아래에 짧은 예제가 있습니다.
+
+![iterator2.png](https://images.velog.io/post-images/jakeseo_me/3eace230-9bee-11e9-88b1-8170e490bd45/iterator2.png)
+> iterator의 예제
+
+4번째 줄에서, 우리는 iterator를 만들었습니다. `next` 메소드가 정의된 오브젝트입니다. `next` 메소드는 `step` 변수에 따라 값을 반환합니다. 25번째 줄에서 우리는 `iterator`를 가져옵니다. 27번째 줄에서, 우리는 `next`를 호출합니다. `done`이 `true`가 될 때까지 next를 계속하여 호출합니다. 
+
+이게 바로 `for-of` 반복 내부에서 일어나는 일입니다. `for-of` 반복은 **iterable**한 것을 인자로 받아서 **iterator**로 만듭니다. 그리고 `next()`메소드를 `done`이 true가 될 때까지 호출합니다.
+
+### 자바스크립트 내에서 반복 가능(Iterable)한 것들
+
+자바스크립트에서 많은 것들이 반복 가능합니다. 즉시 보이진 않을 수 있어도, 면밀하게 조사해보면, 반복 가능(iterable)한 것들이 보이기 시작합니다.
+
+**다음에 나열된 것들은 전부 반복 가능(Iterable)한 것들입니다.**
+
+- **배열**과 **[타입이 정해진 배열](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)**
+- **문자열** - 각 문자 또는 [유니코드](https://developer.mozilla.org/en-US/docs/Glossary/Unicode) 코드-포인트를 반복합니다.
+- **맵** - 키-값 쌍을 반복합니다.
+- **셋** - 원소를 반복합니다.
+- `arguments` - 함수의 배열과 같은 특별한 변수를 반복합니다.
+- DOM 원소들 
+
+**자바스크립트에서 몇몇 반복가능한 것(iterables)을 인자로 사용하는 생성자들은 다음과 같습니다.**
+
+- `for-of` 반복 - `for-of` 반복은 반복 가능한 것을 필요로 합니다. 반복이 불가능하다면, `for-of`는 `TypeError`를 던질 것입니다.
+
 ## Generator
 
 ES6는 **Generator (또는 Generator 함수)** 형태에서 함수와 Iterator를 다루는 방법을 새롭게 소개했습니다. 제너레이터는 함수를 **중간에서** 멈추고, *다시 멈췄던 부분부터* 실행할 수 있게 합니다. **요약하면, Generator는 함수의 형태를 띄지만, Iterator처럼 동작합니다.**
