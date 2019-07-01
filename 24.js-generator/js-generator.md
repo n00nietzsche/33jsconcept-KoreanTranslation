@@ -79,8 +79,18 @@ for (let author of myFavouriteAuthors) {
 
 이 메소드를 바로 ***iteratorMethod***라고 합니다.
 
-이와 비슷하게 사용자 정의 오브젝트를 반복하는 프로세스의 표준화가 **ECMA**에 의해 진행되었습니다. 하지만, `iteratorMethod`라는 이름을 사용하는 대신에, ECMA는 `Symbol.iterator`라는 이름을 사용했습니다. **Symbol**은 유일(unique)한 이름을 제공합니다. 그리고 다른 프로퍼티 이름과 충돌이 발생하지 않습니다. 또한, **`Symbol.iterator`는 `iterator`라 불리는 오브젝트를 반환합니다.** 
+이와 비슷하게 사용자 정의 오브젝트를 반복하는 프로세스의 표준화가 **ECMA**에 의해 진행되었습니다. 하지만, `iteratorMethod`라는 이름을 사용하는 대신에, ECMA는 `Symbol.iterator`라는 이름을 사용했습니다. **Symbol**은 유일(unique)한 이름을 제공합니다. 그리고 다른 프로퍼티 이름과 충돌이 발생하지 않습니다. 또한, **`Symbol.iterator`는 `iterator`라 불리는 오브젝트를 반환합니다.** 이 `iterator`는 `next`라 불리는 메소드를 가질 것입니다. `iterator`는 또한 `value`와 `done`이라는 키를 가진 오브젝트입니다.
 
+`value` 키는 현재의 값을 포함할 것입니다. 이 값은 어떠한 타입이든 될 수 있습니다. `done`은 `boolean`입니다. `done`은 모든 값이 전달(fetched)되었는지 아닌지를 나타냅니다.
+
+아래의 그림이 **iterables, iterators, next** 사이의 관계를 알아보는데 도움을 줄 수 있습니다. **이 관계를 Iteration Protocol(반복 프로토콜)이라고 부릅니다.**
+
+![iteration1.png](https://images.velog.io/post-images/jakeseo_me/f0d55250-9bec-11e9-8e89-732c0e0c57cd/iteration1.png)
+
+>이 그림은 Dr Axel Rauschmayer의 책 **Exploring JS**에 나오는 내용입니다.
+
+- **iterable**은 자신의 원소들이 외부에서 접근 가능하도록 만들길 원하는 자료 구조입니다. 키가 `Symbol.iterator`인 메소드를 구현함으로써 원소들이 외부에서 접근 가능하도록 만듭니다. `Symbol.iterator` 메소드는 **iterator**를 위한 공장이라고 보면 됩니다. **iterator**들을 만들어냅니다.
+- **iterator**는 자료 구조의 원소들을 순회할 수 있는 포인터입니다.
 
 ## Generator
 
