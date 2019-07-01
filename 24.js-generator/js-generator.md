@@ -66,7 +66,21 @@ for (let author of myFavouriteAuthors) {
 위에 나온 구현 방법은 정말 간단한 접근법입니다. 모든 author를 가져오긴 합니다. 하지만, 아직 몇가지 문제들이 이 구현된 코드 속에 남아있습니다. 몇가지는 다음과 같습니다.
 
 - `getAllAuthors`는 매우 제한적입니다. 만일 어떤 사람이 `myFavouriteAuthors`를 만든다면, 그 사람은 이 메소드의 이름을 `retrieveAllAuthors`로 바꿀 것입니다.
-- 
+- 개발자로서 우리는 항상 모든 데이터를 반환하는 정확한 메소드를 알아둘 필요가 있습니다. 이 경우에는, `getAllAthors`라는 이름의 메소드입니다.
+- `getAllAuthors`는 모든 author의 문자열의 배열을 반환합니다. 만일, 다른 개발자가 오브젝트를 다음과 같은 포맷으로 반환하면 어떻게 할까요?
+
+```js
+[ {name: 'Agatha Christie'}, {name: 'J. K. Rowling'}, ...]
+```
+
+개발자는 반드시 모든 데이터를 반환하는 메소드의 **정확한 이름과 반환 타입**을 알아야 할 것입니다.
+
+만일, 우리가 메소드의 **이름과 반환 타입이 고정되어 있고 변하지 않는다는 규칙**을 만들면 어떨까요?
+
+이 메소드를 바로 ***iteratorMethod***라고 합니다.
+
+이와 비슷하게 사용자 정의 오브젝트를 반복하는 프로세스의 표준화가 **ECMA**에 의해 진행되었습니다. 하지만, `iteratorMethod`라는 이름을 사용하는 대신에, ECMA는 `Symbol.iterator`라는 이름을 사용했습니다. **Symbol**은 유일(unique)한 이름을 제공합니다. 그리고 다른 프로퍼티 이름과 충돌이 발생하지 않습니다. 또한, **`Symbol.iterator`는 `iterator`라 불리는 오브젝트를 반환합니다.** 
+
 
 ## Generator
 
