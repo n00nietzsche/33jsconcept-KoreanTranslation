@@ -103,11 +103,13 @@ for (let author of myFavouriteAuthors) {
 
 이게 바로 `for-of` 반복 내부에서 일어나는 일입니다. `for-of` 반복은 **iterable**한 것을 인자로 받아서 **iterator**로 만듭니다. 그리고 `next()`메소드를 `done`이 true가 될 때까지 호출합니다.
 
-### 자바스크립트 내에서 반복 가능(Iterable)한 것들
+### 자바스크립트 내에서 Iterable들
 
-자바스크립트에서 많은 것들이 반복 가능합니다. 즉시 보이진 않을 수 있어도, 면밀하게 조사해보면, 반복 가능(iterable)한 것들이 보이기 시작합니다.
+> Iterable은 영어단어로 반복 가능한이란 뜻을 가지는 형용사가 될 수 있지만, 여기서는 일종의 고유명사로 생각하셔야 합니다. Iterable이란 자체가 반복 가능한 어떠한 객체정도로 생각해주세요.
 
-**다음에 나열된 것들은 전부 반복 가능(Iterable)한 것들입니다.**
+자바스크립트에서 많은 것들이 반복 가능합니다. 즉시 보이진 않을 수 있어도, 면밀하게 조사해보면, iterable이 보이기 시작합니다.
+
+**다음에 나열된 것들은 Iterable입니다.**
 
 - **배열**과 **[타입이 정해진 배열](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypedArray)**
 - **문자열** - 각 문자 또는 [유니코드](https://developer.mozilla.org/en-US/docs/Glossary/Unicode) 코드-포인트를 반복합니다.
@@ -116,7 +118,7 @@ for (let author of myFavouriteAuthors) {
 - `arguments` - 함수의 배열과 같은 특별한 변수를 반복합니다.
 - DOM 원소들 
 
-**자바스크립트에서 몇몇 반복가능한 것(iterables)을 인자로 사용하는 생성자들은 다음과 같습니다.**
+**자바스크립트에서 iterables을 인자로 사용하는 생성자들은 다음과 같습니다.**
 
 - `for-of` 반복 - `for-of` 반복은 반복 가능한 것을 필요로 합니다. 반복이 불가능하다면, `for-of`는 `TypeError`를 던질 것입니다.
 
@@ -124,7 +126,7 @@ for (let author of myFavouriteAuthors) {
 for (const value of iterable) { ... }
 ```
 
-- **배열의 비구조화** - 비구조화는 반복 가능(iterable)하기에 일어납니다. 정확히 어떤 일이 일어나는지 살펴봅시다.
+- **배열의 비구조화 (Destructuring of Arrays)** - 비구조화는 반복 가능(iterable)하기에 일어납니다. 정확히 어떤 일이 일어나는지 살펴봅시다.
 
 ```js
 const array = ['a', 'b', 'c', 'd', 'e'];
@@ -143,7 +145,88 @@ iterator.next().value // Since it was skipped, so it's not assigned
 const last = iterator.next().value
 ```
 
+- **전개 연산자 (Spread operator)**
 
+다음 코드를 봅시다.
+
+```js
+const array = ['a', 'b', 'c', 'd', 'e'];
+const newArray = [1, ...array, 2, 3];
+```
+
+위의 코드는 다음과 같이 쓰여질 수 있습니다.
+
+```js
+const array = ['a', 'b', 'c', 'd', 'e'];
+const iterator = array[Symbol.iterator]();
+
+const newArray = [1];
+for (let nextValue = iterator.next(); nextValue.done !== true; nextValue = iterator.next()) {
+  newArray.push(nextValue.value);
+}
+
+newArray.push(2)
+newArray.push(3)
+```
+
+- `Promise.all` 과 `Promise.race` 역시 Promise 전반에서 iterable을 수용합니다.
+
+- **Map과 Set**
+
+Map의 생성자는 Iterable `[key, pair]`의 쌍을 Map으로 변화시킵니다. 그리고 Set의 생성자는 Iterable의 `[key, pair]`의 쌍을 Set으로 변화시킵니다.
+
+```js
+const map = new Map([[1, 'one'], [2, 'two']]);
+map.get(1);
+// one
+
+const set = new Set(['a', 'b', 'c']);
+set.has('c')
+// true
+```
+
+- Iterator는 또한 Generator의 선배입니다.
+
+### myFavouriteAuthors를 Iterable로 만들기
+`myFavouriteAuthors`가 iterable이 된 구현이 다음 코드에 있습니다.
+
+```js
+const myFavouriteAuthors = {
+  allAuthors: {
+    fiction: [
+      'Agatha Christie', 
+      'J. K. Rowling',
+      'Dr. Seuss'
+    ],
+    scienceFiction: [
+      'Neal Stephenson',
+      'Arthur Clarke',
+      'Isaac Asimov', 
+      'Robert Heinlein'
+    ],
+    fantasy: [
+      'J. R. R. Tolkien',
+      'J. K. Rowling',
+      'Terry Pratchett'
+    ]
+  },
+  [Symbol.iterator]() {
+    // 모든 작가를 배열로 받기
+    const genres = Object.values(this.allAuthors);
+    
+    // 현재의 장르와 작가 인덱스를 저장하기
+    let currentAuthorIndex = 0;
+    let currentGenreIndex = 0;
+    
+    return {
+      // next() 구현
+      next() {
+        // 
+      }
+    }
+  }
+}
+```
 
 ## Generator
 
