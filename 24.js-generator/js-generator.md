@@ -375,3 +375,100 @@ Line 6에서, 우리는 또 `next()`를 호출합니다. 이번에는 다음에 
 
 이제 다시 값을 생성하기 위해서는 새로운 제너레이터를 만들어야 합니다.
 
+## 제너레이터의 쓰임
+
+제너레이터는 다양한 방법으로 멋지게 쓰일 수 있습니다. 몇가지 예시를 보러갑시다.
+
+### Iterable 수행하기
+
+여러분이 iterator를 수행할 때, 여러분은 `next()` 메소드를 가진 iterator 오브젝트를 직접 만들어야 합니다. 또한, 여러분은 상태를 직접 저장해야 합니다. 가끔씩은, 정말 그렇게 하기 귀찮은 상황이 옵니다. 제너레이터는 iterable(반복 가능)하기 때문에, 제너레이터는 귀찮은 추가적인 보일러플레이트 코드 없이 iterable을 수행하는데에 사용될 수 있습니다. 간단한 예제를 봅시다.
+
+문제: 우리는 커스텀 `This`, `is`, `iterable.`을 반환하는 iterable을 만들기를 원합니다. 여기 iterator를 이용한 예제가 있습니다.
+
+```js
+const iterableObj = {
+  [Symbol.iterator]() {
+    let step = 0;
+    return {
+      next() {
+        step++;
+        if (step === 1) {
+          return { value: 'This', done: false };
+        }
+        else if (step === 2) {
+          return { value: 'is', done: false };
+        }
+        else if (step === 3) {
+          return { value: 'iterable.', done: false };
+        }
+        return { value: '', done: true };
+      }
+    }
+  }
+}
+
+for (const val of iterableObj) {
+  console.log(val);
+}
+
+// This
+// is
+// iterable.
+```
+
+제너레이터를 이용하면 다음과 같은 코드로 작성 가능합니다.
+
+```js
+function * iterableObj() {
+  yield 'This';
+  yield 'is';
+  yield 'iterable.';
+}
+
+for (const val of iterableObj()) {
+  console.log(val);
+}
+
+// This
+// is
+// Iterable.
+```
+
+두가지 버전을 비교해보세요. 사실 약간 억지 느낌이 있는 것은 사실이지만, 다음과 같은 사실들을 살펴볼 수 있습니다.
+
+- `Symbol.iterator`를 생각할 필요가 없습니다.
+- `next()`를 구현할 필요가 없습니다.
+- `next()` 내부에 쓰이는 `{ value: 'This', done: false }`와 같은 반환 오브젝트에 대해 작성할 필요도 없습니다.
+- 상태를 저장할 필요도 없습니다. iterator 예제에서는, 상태가 `step`이라는 변수에 저장되었습니다. `step`은 iterable로부터 무엇이 결과물로 나왔는지를 정의하는 값이었습니다. 제너레이터에서는 이러한 귀찮은 작업들이 필요 없습니다.
+
+### 더 나은 비동기 함수성
+
+promise와 콜백을 사용한 코드가 가능합니다.
+
+```js
+function fetchJson(url) {
+  return fetch(url)
+  .then(request => request.text())
+  .then(text => {
+    return JSON.parse(text);
+  })
+  .catch(error => {
+    console.log(`ERROR: ${error.stack}`);
+  });
+}
+```
+
+위 코드는 다음과 같이 쓰여질 수 있습니다. ([co.js](https://github.com/tj/co?source=post_page---------------------------)라는 라이브러리의 도움을 조금 받습니다.)
+
+```js
+const fetchJson = co.wrap(function * (url) {
+  try {
+    let request = yield function(url);
+    let text = yield request.text();
+    return JSON.parse(text);
+  }catch (error) {
+    console.log(`ERROR: ${error.stack}`);
+  }
+});
+```
+
