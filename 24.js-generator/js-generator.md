@@ -265,10 +265,88 @@ console.log(...myFavouriteAuthors);
 
 이번 Iterator 설명 글에서 얻은 지식으로 여러분은 iterator가 어떻게 작동하는지 쉽게 알 수 있었을 것입니다. 로직은 따라가기 힘들 수도 있습니다. 그래서, 코드에 주석을 열심히 달아놓았습니다. 하지만 코드와 개념을 진정으로 이해하려면 브라우저나 노드에서 직접 코드를 실행해보시기 바랍니다.
 
-## Generator
+## 제너레이터(Generator)
 
-ES6는 **Generator (또는 Generator 함수)** 형태에서 함수와 Iterator를 다루는 방법을 새롭게 소개했습니다. 제너레이터는 함수를 **중간에서** 멈추고, *다시 멈췄던 부분부터* 실행할 수 있게 합니다. **요약하면, Generator는 함수의 형태를 띄지만, Iterator처럼 동작합니다.**
+ES6는 **제너레이터(Generator) 또는 Generator 함수** 형태에서 함수와 Iterator를 다루는 방법을 새롭게 소개했습니다. 제너레이터는 함수를 **중간에서** 멈추고, *다시 멈췄던 부분부터* 실행할 수 있게 합니다. **요약하면, Generator는 함수의 형태를 띄지만, Iterator처럼 동작합니다.**
 
 **재미있는 사실은** `async/await`이 Generator를 기반으로 한 것이라는 겁니다. [여기](https://tc39.github.io/ecmascript-asyncawait/)에서 더 자세히 읽어보세요.
 
 Generator는 Iterator와 복잡하게 연결되어 있습니다.
+
+Generator를 자세히 알아보기전에 다음 비유를 통해 Generator에 대해 직관적으로 알아봅시다.
+
+여러분이 손톱을 물어뜯게하는 긴박감 넘치는 하이테크 추리소설을 읽고 있다고 상상해보세요. 책의 페이지에 엄청나게 집중하고 있고, 거의 초인종 소리도 못 들을 정도라고 생각해봅시다. 그 상황에서 갑자기 피자배달부가 왔습니다. 여러분은 문을 열어주기 위해서 자리에서 일어났습니다. **문을 열어주기 전에, 여러분은 여러분이 읽던 책 중간에 책갈피를 꽂아뒀습니다.** 여러분은 머릿속에 여러분이 읽고 있던 스토리를 잠시 기억해둡니다. 그리고 여러분은 문 밖으로 나가서 피자를 받습니다. 방에 다시 돌아왔을 때, 여러분은 여러분이 **책갈피를 꽂아둔 페이지부터** 다시 읽기 시작합니다. 여러분은 책을 첫 페이지부터 다시 읽을 필요가 없습니다. 이러한 방식으로 여러분은 이미 Generator 함수처럼 행동하고 있는 것입니다.
+
+## 소개
+
+프로그래밍 중에 발생하는 일반적인 문제를 해결하기 위해 어떻게 제너레이터를 활용할 수 있을지 봅시다. 하지만 그 전에, 제너레이터가 뭔지부터 알아봅시다.
+
+### 제너레이터란 무엇인가?
+
+아래 소스에 있는 함수와 같이 일반적인 함수들은 작업이 끝나기 전엔 끝낼 수 없습니다. 이러한 형태의 함수를 [run-to-complete](https://en.wikipedia.org/wiki/Run_to_completion_scheduling?source=post_page---------------------------) 모델이라고 합니다.
+
+```js
+function normalFunc() {
+  console.log('I');
+  console.log('cannot');
+  console.log('be')
+  console.log('stopped.')
+}
+```
+
+`normalFunc`에서 탈출하는 유일한 방법은 `return` 영역에 들어가는 것입니다. 아니면 에러를 `throw`하거나요. 만일 여러분이 함수를 다시한번 호출하면, 함수는 **다시** 맨위 에서부터 실행을 시작할 것입니다.
+
+반대로, 제너레이터는 **중간에 멈출 수 있는** 함수입니다. 그리고 멈춘 부분부터 다시 실행을 시작할 수 있습니다.
+
+제너레이터의 일반적인 정의는 다음과 같습니다.
+
+- 제너레이터는 아이터레이터 작성 작업을 간단하게 해줄 수 있는 함수들의 특별한 클래스입니다.
+- 제너레이터는 하나의 값 대신에 결과의 순서를 생성하는 함수입니다. 이를테면 제너레이터는 값의 시리즈를 *만들어(generate)* 냅니다.
+
+자바스크립트에서, 제너레이터는 `next()`를 호출할 수 있는 오브젝트를 반환하는 함수입니다. 여러분이 `next()` 호출을 할 때마다, 다음과 같은 형태의 오브젝트를 반환합니다.
+
+```js
+{
+  value: Any,
+  done: true|false
+}
+```
+
+`value` 프로퍼티는 값을 가집니다. `done` 프로퍼티는 `true` 혹은 `false`를 갖습니다. `done`이 `true`가 될 때, 제너레이터는 멈추고 더 이상 값을 만들어내지 않습니다.
+
+아래는 제너레이터를 설명한 그림입니다.
+
+![GeneratorArchitecture.png](https://images.velog.io/post-images/jakeseo_me/6bc9dbc0-aae3-11e9-8649-35506338cef4/GeneratorArchitecture.png)
+> 일반적인 함수 vs 제너레이터 함수
+
+> 그림에 나온 메시지를 간단히 해석하자면, 제너레이터가 실행되다가 yield를 만나면 멈추고 그 구간을 빠져나오면 다시 시작되고 다시 yield를 만나면 멈춘다는 이야기입니다.
+
+이미지의 제너레이터 부분을 끝내기 전에 **yield-resume-yield** 루프로 다시 연결되는 화살표를 잘 보세요. **제너레이터가 영영 끝나지 않는 경우의 수도 있습니다.** 이 예제는 다음에 다시 살펴봅시다.
+
+### 제너레이터 만들어보기
+
+자바스크립트에서 우리는 어떻게 제너레이터를 만들 수 있을까요?
+
+```js
+function * generatorFunction() { // Line 1
+  console.log('This will be executed first.');
+  yield 'Hello, ';
+ 
+  console.log('I will be printed after the pause');
+  yield 'World!' ;
+}
+
+const generatorObject = generatorFunction(); // Line 3
+
+console.log(generatorObject.next().value); // Line 4
+console.log(generatorObject.next().value); // Line 5
+console.log(generatorObject.next().value); // Line 6
+
+// This will be executed first.(이게 아마 처음 실행될 것입니다.)
+// Hello,
+// I will be printed after the pause(정지 후엔 다음과 같은 말이 출력될 것입니다.)
+// World!
+// undeifned
+```
+
+위에서 **function *, yield, generatorObject, generatorObject.next** 부분을 유심히 봅시다. 위의 소스에서 우리는 `function`이라는 일반적인 함수 선언 대신에 `function *`이라는 문법을 사용해서 함수를 선언했습니다. 
