@@ -330,7 +330,7 @@ function normalFunc() {
 ```js
 function * generatorFunction() { // Line 1
   console.log('This will be executed first.');
-  yield 'Hello, ';
+  yield 'Hello, '; // Line 2
  
   console.log('I will be printed after the pause');
   yield 'World!' ;
@@ -349,4 +349,19 @@ console.log(generatorObject.next().value); // Line 6
 // undeifned
 ```
 
-위에서 **function *, yield, generatorObject, generatorObject.next** 부분을 유심히 봅시다. 위의 소스에서 우리는 `function`이라는 일반적인 함수 선언 대신에 `function *`이라는 문법을 사용해서 함수를 선언했습니다. 
+위에서 **function *, yield, generatorObject, generatorObject.next** 부분을 유심히 봅시다. 위의 소스에서 우리는 `function`이라는 일반적인 함수 선언 대신에 `function *`이라는 문법을 사용해서 함수를 선언했습니다. `function` 키워드와 `*` 그리고 함수 이름 사이에는 얼만큼의 빈공간이든 들어올 수 있습니다. 왜냐하면 이건 그냥 함수이고, 함수가 사용되는 곳이면 어디서든 사용할 수 있습니다. 예를 들면, 오브젝트 내부 그리고 클래스 메소드로도 사용 가능합니다.
+
+함수의 바디 부분 내부에서, 우리는 `return` 키워드를 사용하지 않습니다. 그 대신에, 우리는 `yield`라는 키워드를 대신 사용합니다. (Line 2) `yield`라는 키워드는 제너레이터가 멈추게 할 수 있는 연산자(operator)입니다. 제너레이터가 `yield`를 만날 때마다, 제너레이터는 `yield` 뒤에 기재된 값을 반환합니다. 이번 경우에는 `Hello, `라는 값이 반환되었습니다. 하지만, 우리는 제너레이터의 맥락에서는 "반환(리턴)되었다." 라는 표현을 쓰지 않습니다. 우리는 대신에 "제너레이터가 `Hello, `라는 값을 **yield(생산)** 했다." 라고 말합니다.
+
+> yield는 한국어 단어 중 어떤 말로 써도 어색하기에 그냥 영어 문자 그대로를 가져가겠습니다.
+
+제너레이터에서 물론 값을 그냥 반환(return)하는 것도 가능합니다. 하지만, `return`은 `done` 프로퍼티를 `true`로 설정합니다. 그래서 그 이후로는 제너레이터는 어떠한 값도 generate(생산)해낼 수 없습니다.
+
+```js
+function * generatorFunc() {
+  yield 'a';
+  return 'b'; // 제너레이터는 여기서 끝납니다.
+  yield 'a'; // 영영 실행될 수 없습니다.
+}
+```
+
