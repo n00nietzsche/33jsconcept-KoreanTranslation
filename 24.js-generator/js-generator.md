@@ -472,3 +472,131 @@ const fetchJson = co.wrap(function * (url) {
 });
 ```
 
+몇몇 독자들은 위의 코드를 보고 "`async/await`의 사용을 나열해놓은 것 같은데?" 라고 생각할 수도 있습니다. 사실 틀린 생각이 아닙니다. `async/await`은 비슷한 전략을 따라갑니다. `async/await`은 promise가 있고, `yield`를 `await`으로 교체합니다. `async/await`은 generator를 바탕으로 할 수 있습니다. 더 많은 정보를 얻기 위해서는 [이 코멘트](https://medium.com/@pawk/hey-great-article-few-remarks-here-ae93d827e47b)를 보시면 도움이 될 것입니다.
+
+### 끊이지 않는 데이터 스트림
+
+영원히 끝나지 않는 제너레이터를 만드는 것도 가능합니다. 다음 예제를 봅시다.
+
+```js
+function * naturalNumbers() {
+  let num = 1;
+  while (true) {
+    yield num;
+    num = num + 1;
+  }
+}
+
+const numbers = naturalNumbers();
+
+console.log(numbers.next().value);
+console.log(numbers.next().value);
+
+// 1
+// 2
+```
+
+우리는 `naturalNumbers`라는 generator를 만들었습니다. 함수 내부에서, 우리는 무한한 `while` 루프를 갖습니다. 그 루프 내부에서, 우리는 `num`을 `yield`합니다. generator가 yield할 때, 함수는 잠시 정지(suspended)됩니다. 우리가 `next()`를 다시 호출할 때, generator는 다시 깨어나고 멈췄던 부분부터 다시 동작합니다.(정확히 말하자면 `yield`다음부터 입니다.) 그리고 또 다른 `yield`를 만날 때까지 계속 실행합니다. 만일 또 다른 `yield`를 만나지 못한다면, generator를 종료합니다. 이번 경우에, 다음 문장은 `num = num + 1`이기 때문에, `num`을 업데이트 합니다. 그 후에, while loop의 맨 위로 갑니다. 조건이 여전히 `true`여서 계속 실행됩니다. 이 함수는 또 다음 줄의 `yield num`을 만납니다. 그 이후에 업데이트된 `num`을 `yield`하고, 정지합니다. 여러분이 원하는만큼 이러한 동작을 반복합니다. 
+
+### Observer(관찰자)로서의 Generator
+
+Generator는 `next(val)`함수를 사용하여 값을 받을 수 있습니다. generator가 새로운 값을 받을 때, 깨어나기 때문에, generator는 observer로도 불립니다. 이러한 동작은 값을 *지켜보다(observing)* 가 generator가 값을 가졌을 때, generator가 동작한다고 생각될 수 있습니다. [여기](http://exploringjs.com/es6/ch_generators.html?source=post_page---------------------------#sec_generators-as-observers)에서 이러한 패턴에 대해 조금 더 알아볼 수 있습니다.
+
+## Generator의 장점
+
+### Lazy Evaluation (게으른 계산)
+
+**끊이지 않는 데이터 스트림** 예제에서 보았듯이, 그와 같은 행동은 Lazy Evaluation이라는 특성 때문에 가능합니다. Lazy Evaluation은 값이 필요로 될 때까지, 표현식의 Evaluation을 미루는 Evaluation 모델입니다. 우리가 만일 값이 필요 없다면, Evaluation이 일어나지 않습니다. 우리가 필요한 때에 값은 계산됩니다. 다음 예제를 봅시다.
+
+```js
+function * powerSeries(number, power) {
+  let base = number;
+  while (true) {
+    yield Math.pow(base, power);
+    base++;
+  }
+}
+```
+
+`powerSeries`는 power에 여러가지 number값을 줍니다. 예를 들면, `powerSeries`에 3을 준다면 3의 제곱부터 순서대로, **9, 16, 25, 36, 49** 를 `yield` 하게 될 것입니다. 우리가 `const powersOf2 = powerSeries(3, 2);`를 소스코드에 칠 때, 우리는 그냥 generator 오브젝트를 하나 만들 뿐입니다. 아직 아무런 값도 계산되지 않았습니다. 이제, 우리는 `next()`를 호출합니다. 9가 계산되고 반환됩니다.
+
+### 메모리 효율
+
+Lazy Evaluation은 즉각적으로 우리의 generator가 메모리 효율을 고려할 수 있다는 것을 알려줍니다. 우리는 필요로되는 값만 생성합니다. 일반적인 함수로 값을 구한다면, 우리는 모든 값을 미리 계산하여 구해놔야 합니다. 그리고 우리가 나중에 쓸 일을 대비해서 그 값을 가지고 있어야 합니다. 하지만, generator를 사용하여, 우리는 우리가 필요할 때까지 우리는 계산을 미룰 수 있습니다.
+
+우리는 generator에서 작동할 Combinator 함수를 만들 수 있습니다. Combinator는 새로운 값들을 만들기 위해 존재하는 iterable을 함께 사용하는 함수입니다. 다음은 Combinator함수인 `take`입니다. 이 함수는 iterable의 첫 `n` 엘리먼트를 가져가서 그에 따른 연산을 합니다. 다음 구현을 참조하세요.
+
+```js
+function * take(n, iter) {
+  let index = 0;
+  for (const val of iter) {
+    if (index >= n) {
+      return;
+    }
+    index = index + 1;
+    yield val;
+  }
+}
+```
+
+다음은 `take`의 사용 예제입니다.
+
+```js
+take(3, ['a', 'b', 'c', 'd', 'e']);
+
+// a b c
+
+take(7, naturalNumbers());
+
+// 1 2 3 4 5 6 7
+
+take(5, powerSeries(3, 2));
+
+// 9 16 25 36 49
+```
+
+다음은 [cycled](https://github.com/sindresorhus/cycled?source=post_page---------------------------) 라이브러리의 구현입니다. (함수의 성질 자체를 뒤집지 않고 만듭니다.)
+
+```js
+function * cycled(iter) {
+  const arrOfValues = [...iter];
+  while (true) {
+    for (const val of arrOfValues) {
+      yield val;
+    }
+  }
+}
+
+console.log(...take(10, cycled(take(3, naturalNumbers()))));
+
+// 1 2 3 1 2 3 1 2 3 1
+```
+
+### 경고(Caveats)
+
+generator를 이용하여 프로그래밍하는 중에 반드시 잊지 말아야 할 것이 있습니다.
+
+- **generator 오브젝트는 오직 한 번만 접근 가능하다.** 여러분이 만일 모든 값을 사용했다면, 소진된 generator는 다시는 반복을 수행할 수 없습니다. 다시 값을 생성해내려면, 다시 generator 오브젝트를 생성해야 합니다.
+
+```js
+const numbers = naturalNumbers();
+
+console.log(...take(10, numbers)) // 1 2 3 4 5 6 7 8 9 10
+console.log(...take(10, numbers)) // 데이터를 얻을 수 없습니다.
+```
+
+- generator 오브젝트는 배열을 이용한 값의 랜덤한 접근을 허락하지 않습니다. 왜냐하면 generator는 오직 한 번에 한 개의 값만 만들어냅니다. 랜덤한 값에 접근하는 행위는 그 엘리먼트에 도달할 때까지, 값을 계속 계산하게 할 것입니다. 결국 랜덤한 접근이 아니게 됩니다.
+
+## 결론
+
+generator 에 대한 많은 것들이 아직 다뤄지지 않았습니다. `yield *`라던지, `return()`, `throw()`와 같은 것들이 다루어지지 않았습니다. generator는 또한 [coroutine](https://en.wikipedia.org/wiki/Coroutine?source=post_page---------------------------)도 가능하게 만듭니다. 아래에 generator에 대한 추가적인 이해를 돕기 위한 몇가지 참고자료들을 나열해놓았습니다.
+
+파이썬의 [itertools] 페이지를 둘러보는 것도 좋은 방법입니다. 그리고 iterator와 generator를 이용하여 어떤 것을 구현할 수 있는지 구경해보세요. 연습문제로, 여러분은 여러분 스스로 그 활용 예제들을 코딩해볼 수 있을 것입니다.
+
+### References -
+
+- [PEP 255](https://www.python.org/dev/peps/pep-0255/?source=post_page---------------------------) — It’s the proposal for generators in Python. But the rationale is applicable to JavaScript as well.
+- [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators?source=post_page---------------------------)
+- An in-depth four-part series by Kyle Simpson on generators and co-routines. Read [here.](https://davidwalsh.name/es6-generators?source=post_page---------------------------)
+- An in-depth review of generators by Axel Rauschmayer. Read it [here.](http://exploringjs.com/es6/ch_generators.html?source=post_page---------------------------)
+- [Python’s itertools](https://docs.python.org/2/library/itertools.html?source=post_page---------------------------#itertools.chain) — It’s an builtin library in Python that has lots of utilities for working with generators and iterators.
