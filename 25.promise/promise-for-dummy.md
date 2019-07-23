@@ -27,3 +27,166 @@ Promise는 요약하자면 다음과 같습니다.
 2. Fulfilled(이행) : 어머니의 기분이 괜찮아서, 스마트폰을 사줬습니다.
 3. Rejected(거절) : 어머니가 기분이 괜찮지만, 스마트폰은 사주지 않기로 했습니다.
 
+## Promise 만들기
+
+이제 위에서 배웠던 내용을 자바스크립트 코드로 만들어봅시다!
+
+```js
+// ES 5 //
+var is MomHappy = false;
+
+// Promise
+var willIGetNewPhone = new Promise(
+  function (resolve, reject) {
+    if(isMomHappy) {
+      var phone = {
+        brand: 'Samsung',
+        color: 'black'
+      };
+      resolve(phone); //fulfilled
+    }
+    else {
+      var reason = new Error('mom is not happy');
+      reject(reason); //reject
+    }
+  }
+);
+```
+
+코드만 봐도 대략 무슨 내용인지 알기 쉽습니다.
+
+```js
+// promise의 문법은 대략 다음과 같이 생겼습니다.
+new Promise(/_ executor _/ function (resolve, reject) { ... });
+```
+
+## Promise 사용하기
+
+이제 Promise를 만들어보았으니, 사용해봅시다.
+
+```js
+// ES 5 //
+...
+
+// Promise 호출
+var askMom = function () {
+  willGetNewPhone
+    .then(function (fulfilled) {
+      // 와! 새 폰을 얻었다!
+      console.log(fulfilled);
+    // output: { brand: 'Samsung', color: 'black' }
+    })
+    .catch(function (error) {
+      // 이런. 엄마가 폰을 안사주네..
+      console.log(error.message);
+    // output: 'mom is not happy'
+    });
+}
+```
+
+예제를 실행해보고 결과를 봅시다.
+
+데모는 [여기서](https://jsbin.com/nifocu/1/edit?js,console) 할 수 있습니다.
+
+![promisetest1.webp](https://images.velog.io/post-images/jakeseo_me/877b5a80-ace4-11e9-9e4b-3bee38b6a611/promisetest1.webp)
+
+## Promise 연계(Chaining)하기
+
+Promise는 연계 가능(Chainable)합니다.
+
+여러분은 **아이(Kid)** 입니다. 새로운 스마트폰을 사면 친구들에게 보여주기로 **약속(Promise)** 했다고 생각해봅시다.
+
+새로운 Promise를 작성해봅시다. 
+
+```js
+...
+
+// 2nd promise
+var showOff = function (phone) {
+  return new Promsie(
+    function (resolve, reject) {
+      var message = 'Hey friend, I have a new ' +
+          phone.color + ' ' + phone.brand + ' phone';
+      
+      resolve(message);
+    };
+  );
+};
+```
+
+더 짧게 작성하면 다음과 같습니다.
+
+```js
+// shorten it
+...
+
+// 2nd promise
+var showOff = function (phone) {
+  var message = 'Hey friend, I have a new ' + 
+              phone.color + ' ' + phone.brand + ' phone';
+  
+  return Promise.resolve(message);
+};
+```
+
+이제 Promise를 연계해봅시다. `willGetNewPhone` Promise를 수행한 이후에만, `showOff` Promise를 수행할 수 있습니다.
+
+```js
+...
+
+// call our promise
+var askMom = function () {
+  willGetNewPhone
+  .then(showOff) // 여기서 연계합니다.
+  .then(function (fulfilled) {
+    console.log(fulfilleded);
+    // output: 'Hey friend, I have a new black Samsung phone.'
+  })
+  .catch(function (error) {
+    // oops, mom don't buy it
+    console.log(error.message);
+  // output: 'mom is not happy'
+  });
+};
+```
+
+Promise를 연계하는 것은 이렇게나 쉽습니다.
+
+## Promise는 비동기(Asynchronous)다.
+
+Promise는 비동기입니다. Promise를 호출한 전과 이후에 메시지를 로깅해봅시다.
+
+```js
+var askMom = function () {
+  console.log('before asking Mom'); // log before
+  willGetNewPhone
+    .then(showOff)
+    .then(function (fulfilled) {
+      console.log(fulfilled);
+    })
+    .catch(function (error) {
+      console.log(error.message);
+    });
+  console.log('after asking Mom');
+}
+```
+
+출력 순서가 어떻게 될까요? 맞춰보세요.
+
+아마 다음과 같을 수 있겠죠?
+
+```
+1. before asking mom
+2. Hey friend, I have a new black Samsung phone.
+3. after asking mom
+```
+
+하지만 사실 실제 출력은 다음과 같이 이뤄집니다.
+
+```
+1. before asking mom
+2. after asking mom
+3. Hey friend, I have a new black Samsung phone.
+```
+
+![promisetest2.webp](https://images.velog.io/post-images/jakeseo_me/03b123e0-acf0-11e9-bfa7-2912c87d7587/promisetest2.webp)
