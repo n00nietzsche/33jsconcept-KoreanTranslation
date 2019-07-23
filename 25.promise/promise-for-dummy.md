@@ -190,3 +190,61 @@ var askMom = function () {
 ```
 
 ![promisetest2.webp](https://images.velog.io/post-images/jakeseo_me/03b123e0-acf0-11e9-bfa7-2912c87d7587/promisetest2.webp)
+
+**왜냐구요? JS는 누구도 기다려주지 않으니까요.**
+
+여러분도 어머니가 새로운 스마트폰을 사준다는 약속을 계속 기다리기만 하진 않을 것입니다. 그 동안 밖에 나가서 뛰어 놀기도 하고 그러겠죠? 아닌가요? 그게 우리가 말하는 **비동기(Asynchronous)** 입니다. 코드는 어떠한 방해나 결과에 대한 기다림 없이 돌아갈 것입니다. Promise는 오직 코드가 흘러가길 기다릴 뿐입니다. 여러분은 `.then`을 작성하여 코드가 흘러갔을 때 추가적으로 해야할 일을 코딩할 수 있습니다.
+
+## ES5, ES6/2015, ES7에서의 Promise
+
+### ES5 - 주류 브라우저들
+
+위에 작성했던 데모 코드들은 만일 여러분들이 [Bluebird](http://bluebirdjs.com/docs/getting-started.html) Promise 라이브러리만 설치했다면, ES5 환경(모든 주류 브라우저 + 노드JS 환경을 말합니다.)에서 돌아갑니다. ES5는 자체적으로는 Promise를 지원하지 않습니다. Bluebird외에도 다른 유명한 Promise 라이브러리인 [Q](https://github.com/kriskowal/q)가 있으니 참고하세요.
+
+### ES6 / ES2015 - 현대 브라우저들과 NodeJs v6
+
+위의 작성했던 데모 코드들이 라이브러리 없이도 작동합니다. 왜냐하면 ES6는 Promise를 네이티브하게 지원하기 때문입니다. 추가로 ES6 함수들과 함께라면, 화살표 함수를 이용하여 코드를 훨씬 더 간단히 만들 수 있습니다. 그리고 `const`나 `let`과 같은 선언문으로 변수 선언도 가능합니다.
+
+ES6의 코드 예제는 다음과 같습니다.
+
+```js
+// ES 6 //
+const isMomHappy = true;
+
+// Promise
+const willGetNewPhone = new Promise(
+  (resolve, reject) => { // 화살표 함수
+    if (isMomHappy) {
+      const phone = {
+        brand: 'Samsung',
+        color: 'black'
+      };
+      resolve(phone);
+    }
+    else {
+      const reason = new Error('mom is not happy');
+      reject(reason);
+    }
+  }
+);
+
+const showOff = function (phone) {
+  const message = 'Hey friend, I have a new ' +
+            phone.color + ' ' + phone.brand + ' phone';
+  return Promise.resolve(message);
+};
+
+// call our promise
+const askMom = function () {
+  willGetNewPhone
+    .then(showOff)
+    .then(fulfilled => console.log(fulfilled))
+    .catch(error => console.log(error));
+};
+
+askMom();
+```
+
+### ES7 - Async Await이 문법을 더 예쁘게 만들어줍니다.
+
+ES7은 
