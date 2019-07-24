@@ -475,5 +475,49 @@ Promise와 Observable의 몇가지 중대한 차이가 있습니다.
 두려워하지 마세요. Observable로 쓰인 새로운 데모를 봅시다. 이 예제에서, 우리는 Observable을 만들기 위해서 [RxJS](http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html)를 이용할 것입니다.
 
 ```js
+let Observable = Rx.Observable;
+let resultA, resultB, resultC;
 
+function addAsync(num1, num2) {
+  // ES6의 fetch API를 사용합니다. fetch API는 promise를 반환합니다.
+  const promise = fetch(`http://www.example.com?num1=${num1}&num2=${num2}`)
+        .then (x => x.json());
+  
+  return Observable.fromPromise(promise);
+}
+
+addAsync(1, 2)
+.do(x => resultA = x)
+.flatMap(x => resultAsync(x, 3))
+.do(x => resultB = x)
+.flatMAp(x => resultAsync(x, 4))
+.do(x => resultC = x)
+.subscribe(x => {
+  console.log('total: ' + x);
+  console.log(resultA, resultB, resultC);
+});
 ```
+
+데모는 [여기](https://jsbin.com/dosaviwalu/edit?js,console)에 있습니다.
+
+알아둬야 할 것은
+
+Observable은 더 멋진 일을 쉽게 할 수 있는 친구입니다. 예를 들면, `delay` 추가 함수를 3초로 설정하여 지연을 둘 수도 있고 또한 일정 횟수 이후에 다시 호출할 수도 있습니다.
+
+```js
+...
+addAsync(1,2)
+  .delay(3000) // delay 3 seconds
+  .do(x => resultA = x)
+  ...
+```
+
+Observable은 나중에 더 이야기 해봅시다!
+
+## 요약
+
+여러분은 Promise와 callback과 친해졌습니다. 이해하고 사용해보세요. Observable에 대해서는 별로 생각 안하셔도 됩니다. 3가지 모두는 상황에 따라 여러분의 개발에 사용될 수 있습니다.
+
+우린 이해를 위해 `mom promise to buy phone`에 대한 데모코드를 몇개 작성해보았습니다.
+
+그게 끝입니다. 자바스크립트 Promise를 길들이는데 많은 도움이 되었길 바랍니다. Happy Coding!
