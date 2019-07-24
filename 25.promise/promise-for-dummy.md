@@ -464,4 +464,16 @@ addAsync(1, 2)
 
 Promise와 `.then`을 사용하여, 우리는 피라미드 모양의 콜백을 빳빳히 펴냈(Flatten)습니다. 중첩된 부분이 없어서 훨씬 보기 좋아졌습니다. 물론, ES7의 `async` 문법을 사용하면, 우리는 예제를 더 더 깔끔히 작성할 수 있습니다. 이 예제는 여러분들이 직접 작성해보면 좋을 것입니다.
 
-##
+## 새로운 친구 : Observable
+
+Promise 라는 친구를 놓아주기 전에, 비동기 데이터를 더욱 쉽게 다루게 해줄 수 있는 `Observable` 이라는 친구에 대해 알아봅시다.
+
+> Observable은 0개 혹은 그 이상의 이벤트를 내보내는 lazy event stream입니다. 그리고 Observable을 끝낼 수도 있고 안 끝낼 수도 있습니다.
+
+Promise와 Observable의 몇가지 중대한 차이가 있습니다.
+
+두려워하지 마세요. Observable로 쓰인 새로운 데모를 봅시다. 이 예제에서, 우리는 Observable을 만들기 위해서 [RxJS](http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html)를 이용할 것입니다.
+
+```js
+
+```
