@@ -247,4 +247,120 @@ askMom();
 
 ### ES7 - Async Await이 문법을 더 예쁘게 만들어줍니다.
 
-ES7은 
+ES7은 `async`와 `await` 문법을 도입했습니다. 두가지 문법은 비동기 문법을 더 예쁘고 이해하기 쉽게 만들어줍니다. 심지어 `.then`과 `.catch`도 필요 없습니다.
+
+우리 예제를 ES7으로 재작성해봅시다.
+
+```js
+/_ ES7 _/
+const isMomHappy = true;
+
+// Promise
+const willIGetNewPhone = new Promise(
+    (resolve, reject) => {
+        if (isMomHappy) {
+            const phone = {
+                brand: 'Samsung',
+                color: 'black'
+            };
+            resolve(phone);
+        } else {
+            const reason = new Error('mom is not happy');
+            reject(reason);
+        }
+
+    }
+);
+
+// 2nd promise
+async function showOff(phone) {
+    return new Promise(
+        (resolve, reject) => {
+            var message = 'Hey friend, I have a new ' +
+                phone.color + ' ' + phone.brand + ' phone';
+
+            resolve(message);
+        }
+    );
+};
+
+// call our promise
+async function askMom() {
+    try {
+        console.log('before asking Mom');
+
+        let phone = await willIGetNewPhone;
+        let message = await showOff(phone);
+
+        console.log(message);
+        console.log('after asking mom');
+    }
+    catch (error) {
+        console.log(error.message);
+    }
+}
+
+(async () => {
+    await askMom();
+})();
+```
+
+## 왜 Promise이고 언제 써야 할까요?
+
+우리는 왜 Promise가 필요할까요? Promise가 있기 전에는 어떻게 코딩을 했을까요? 이러한 지룸넹 대답하기 전에 다시 근본적인 부분으로 넘어가봅시다.
+
+### 일반 함수 vs 비동기 함수
+
+두 가지 예제를 봅시다. 두 예제 모두 두 숫자를 더하는 예제입니다. 하나는 일반 함수를 이용해 더하고 하나는 원격에서 더합니다.
+
+#### 일반 함수로 두 숫자 더하기
+
+```js
+// add two numbers normally
+
+function add (num1, num2) {
+    return num1 + num2;
+}
+
+const result = add(1, 2); // you get result = 3 immediately
+```
+
+#### 비동기 함수로 두 숫자 더하기
+
+```js
+// add two numbers remotely
+
+// get the result by calling an API
+const result = getAddResultFromServer('http://www.example.com?num1=1&num2=2');
+// you get result  = "undefined"
+```
+
+여러분이 만일 일반 함수로 두 숫자를 더한다면, 결과를 즉시 볼 수 있을 것입니다. 하지만, 여러분이 원격 서버를 이용하여 두 숫자 더하기에 대한 결과 값을 구한다면, 여러분은 기다려야 합니다. 즉시 값을 얻진 못합니다.
+
+또는 이렇게 설명할 수도 있습니다. 여러분은 서버가 다운되거나 응답 지연 때문에 값을 얻을 수 있을지 없을지도 모릅니다. 여러분은 서버가 값을 반환할 때까지 모든 프로세스를 잠시 멈춰두길 원하진 않을 것입니다. 그래서 비동기가 필요합니다.
+
+API를 호추하는 일, 파일을 다운로드하는 일, 파일을 읽는 일 등은 주로 비동기 함수를 사용하여 코딩합니다.
+
+### Promise가 있기 전에 코딩하던 방법 : Callback
+
+우리가 반드시 비동기 호출을 사용해야 할까요? 정답은 아닙니다. Promise 전에 우리는 callback을 사용했습니다. Callback은 여러분이 결과 값을 받으면 수행할 함수입니다. callback의 개념을 받아들이기 위해 이전 예제를 수정해봅시다.
+
+```js
+// add two numbers remotely
+// get the result by calling an API
+
+function addAsync (num1, num2, callback) {
+    // use the famous jQuery getJSON callback API
+    return $.getJSON('http://www.example.com', {
+        num1: num1,
+        num2: num2
+    }, callback);
+}
+
+addAsync(1, 2, success => {
+    // callback
+    const result = success; // you get result = 3 here
+});
+```
+
+문법은 그럭저럭 괜찮아보입니다. 그렇다면 우리는 왜 Promise를 사용해야 할까요?
