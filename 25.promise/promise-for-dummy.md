@@ -364,3 +364,104 @@ addAsync(1, 2, success => {
 ```
 
 문법은 그럭저럭 괜찮아보입니다. 그렇다면 우리는 왜 Promise를 사용해야 할까요?
+
+### 만일 여러분이 연속되는 비동기 액션을 수행하려면 어떻게 해야 할까요?
+
+숫자들을 한 번 더하지 않고, 이번에는 숫자를 세 번 더해보겠습니다. 일반 함수에서요. 우린 다음과 같이 코딩할 것입니다.
+
+```js
+// add two numbers normally
+
+let resultA, resultB, resultC;
+
+ function add (num1, num2) {
+    return num1 + num2;
+}
+
+resultA = add(1, 2); // you get resultA = 3 immediately
+resultB = add(resultA, 3); // you get resultB = 6 immediately
+resultC = add(resultB, 4); // you get resultC = 10 immediately
+
+console.log('total' + resultC);
+console.log(resultA, resultB, resultC);
+```
+
+콜백을 사용하면 어떻게 될까요?
+```js
+// add two numbers remotely
+// get the result by calling an API
+
+let resultA, resultB, resultC;
+
+function addAsync (num1, num2, callback) {
+    // use the famous jQuery getJSON callback API
+    return $.getJSON('http://www.example.com', {
+        num1: num1,
+        num2: num2
+    }, callback);
+}
+
+addAsync(1, 2, success => {
+    // callback 1
+    resultA = success; // you get result = 3 here
+
+    addAsync(resultA, 3, success => {
+        // callback 2
+        resultB = success; // you get result = 6 here
+
+        addAsync(resultB, 4, success => {
+            // callback 3
+            resultC = success; // you get result = 10 here
+
+            console.log('total' + resultC);
+            console.log(resultA, resultB, resultC);
+        });
+    });
+});
+```
+
+데모는 [여기](https://jsbin.com/barimo/edit?html,js,console)있습니다.
+
+문법이 사용자에게 친화적이지 못합니다. 좋은 말로는, 피라미드처럼 보인다고 합니다. 하지만 사람들은 주로 이렇게 된 코드를 "콜백 지옥"이라고 합니다. 왜냐하면 콜백이 다른 콜백 안에 계속 중첩되어 있기 때문입니다. 여러분이 10개의 콜백을 가지고 있다고 가정하면, 10번 중첩을 시켜야 합니다.
+
+### 콜백 지옥에서 빠져나오기
+
+Promise가 우리를 구하러 왔습니다. Promise 버전의 예제를 봅시다.
+
+```js
+// add two numbers remotely using observable
+
+let resultA, resultB, resultC;
+
+function addAsync(num1, num2) {
+    // use ES6 fetch API, which return a promise
+    return fetch(`http://www.example.com?num1=${num1}&num2=${num2}`)
+        .then(x => x.json());
+}
+
+addAsync(1, 2)
+    .then(success => {
+        resultA = success;
+        return resultA;
+    })
+    .then(success => addAsync(success, 3))
+    .then(success => {
+        resultB = success;
+        return resultB;
+    })
+    .then(success => addAsync(success, 4))
+    .then(success => {
+        resultC = success;
+        return resultC;
+    })
+    .then(success => {
+        console.log('total: ' + success)
+        console.log(resultA, resultB, resultC)
+    });
+```
+
+데모는 [여기](https://jsbin.com/qafane/edit?js,console)에 있습니다.
+
+Promise와 `.then`을 사용하여, 우리는 피라미드 모양의 콜백을 빳빳히 펴냈(Flatten)습니다. 중첩된 부분이 없어서 훨씬 보기 좋아졌습니다. 물론, ES7의 `async` 문법을 사용하면, 우리는 예제를 더 더 깔끔히 작성할 수 있습니다. 이 예제는 여러분들이 직접 작성해보면 좋을 것입니다.
+
+##
