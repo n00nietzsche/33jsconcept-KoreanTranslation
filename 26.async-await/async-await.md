@@ -37,4 +37,51 @@ async function f() {
 f().then(alert); // 1
 ```
 
+우리는 명시적으로 promise를 반환할 수도 있습니다. 아래의 코드도 같은 결과를 출력합니다.
+
+```js
+async function f() {
+  return Promise.resolve(1)
+}
+
+f().then(alert); // 1
+```
+
 ![promise-test-1.png](https://images.velog.io/post-images/jakeseo_me/e5d27130-ade9-11e9-bdc2-ada958a32967/promise-test-1.png)
+> 번역자의 경우에는 구글 크롬 개발자도구에서 console로 찍어서도 확인해보았습니다.
+
+`async`는 함수가 promise를 리턴하는 것을 보장해줍니다. 그리고 promise가 아닌 것을 리턴했을 때는 promise로 감싸서 resolve promise를 반환하는 것을 확인했을 것입니다. 상당히 간단하죠? 하지만 그것 뿐만이 아닙니다. 또 다른 키워드 `await`이 있습니다. 이 키워드는 오직 `async` 키워드가 붙은 함수와 함께 동작합니다. 그리고 꽤 멋진 키워드입니다.
+
+### Await
+
+문법은 다음과 같습니다.
+
+```js
+// 오직 async 함수 내부에서만 동작합니다.
+let value = await promise;
+```
+
+키워드 `await`은 자바스크립트가 promise가 작업 이후 결과 값을 리턴할 때까지 잠시 기다리게 만듭니다. 
+
+1초 후에 resolve하는 promise의 예제를 봅시다.
+
+```js
+async function f() {
+  
+  let promise = new Promise((resolve, reject) => {
+    setTimeout(() => resolve("done!"), 1000);
+  });
+  
+  let result = await promise; // promise가 resolve될 때까지 기다립니다 (*)
+  
+  alert(result); // 끝입니다!
+}
+
+f();
+```
+
+함수 실행이 `(*)`의 라인에서 잠시 멈춥니다. 그리고 promise가 완료됐을 때, `result`에는 promise의 결과값이 할당됩니다. 그래서 위의 코드에서 1초 후에 "done!"이라는 메세지가 출력되는 이유입니다.
+
+다음의 내용을 잘 기억합시다: `await`은 말 그대로 자바스크립트가 promise가 끝날 때까지 기다리게 만드는 것입니다. 그 후에 promise의 결과 값을 갖고 다음 부분을 진행합니다. 이 과정은 어떠한 CPU 리소스도 소모하지 않습니다. 왜냐하면 엔진이 그 동안 다른 일을 할 수 있기 때문입니다: 다른 스크립트를 실행하고 이벤트를 다루는 등의 일을 합니다.
+
+이 문법은 promise의 결과를 받고 `promise.then`을 사용하는 것보다 더 우아한 문법입니다. 읽기도 더 쉽고 작성하기도 더 쉽습니다.
