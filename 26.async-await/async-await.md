@@ -99,3 +99,14 @@ function f() {
 
 함수 앞에 `async`라는 키워드를 붙여주지 않는다면, 우리는 이러한 에러를 받게 될 것입니다. 말했던 것처럼 `await`은 오직 `async function` 내부에서만 작동합니다.
 
+`showAvatar()` 예제를 봅시다. 이 예제는 [Promise Chaining](https://javascript.info/promise-chaining)이라는 챕터에서 가져왔습니다. 그리고 우린 이 예제를 `async/await`을 이용하여 다시 작성해볼 것입니다.
+
+1. 우리는 `.then`을 `await`으로 대체할 것입니다.
+2. `await`을 쓰기 위해, 함수에 `async`를 붙여줄 것입니다.
+
+```js
+async function showAvatar() {
+  // read our JSON
+  let response = await fetch('/article/promise-chaining/user.json');
+}
+```
