@@ -435,6 +435,8 @@ demoGithubUser();
 
 > .
 
+트릭은 없습니다. 그냥 대체하는 겁니다. `.catch`를 `try...catch`로 대체하고 `async/await`을 필요한 곳에 넣어주면 됩니다.
+
 ```js
 class HttpError extends Error {
   constructor(response) {
@@ -444,14 +446,88 @@ class HttpError extends Error {
   }
 }
 
-function loadJson(url) {
-  return fetch(url)
-    .then(response => {
-      if(response.status === 200) {
-        return response.json();
+async function loadJson(url) {
+  let response = await fetch(url);
+  
+  if(response.status === 200) {
+    return response.json();
+  }
+  
+  throw new HttpError(response);
+}
+
+async function demoGithubUser() {
+  let name = prompt("Enter a name?", "iliakan");
+  
+  let user;
+  while(true) {
+    try{
+      user = await loadJson(`https://api.github.com/user/${name}`);
+      break;
+    } 
+    catch (err) {
+      if (err instanceof HttpError && err.response.status === 404) {
+        // 루프는 alert 이후에 계속됩니다.
+        alert("No such user, please reenter.");
       } else {
-        throw new HttpError(response);
+        // 알 수 없는 에러가 날 시에, rethrow
+        throw err;
       }
-    });
+    }
+  }
+  
+  alert(`Full name: ${user.name}.`);
+  return user;
+}
+
+demoGithubUser();
+```
+
+### 3. async가 아닌 함수에서 async 함수 호출하기
+
+우리는 "일반" 함수를 갖고 있습니다. 어떻게 `async`를 일반 함수에서 호출할까요? 그리고 결과를 어떻게 이용할 수 있을까요?
+
+```js
+async function wait() {
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  return 10;
+}
+
+function f() {
+  // ... 여기에 무엇을 적어야 할까요?
+  // 우리는 async wait()을 호출하고 10을 반환받을 때까지 기다려야 합니다.
+  // 우리가 "await" 쓸 수 없음을 기억하세요.
 }
 ```
+
+P.S. task는 기술적으로 매우 쉽습니다 하지만 async/await을 처음 다뤄보는 개발자들에게 이 질문은 매우 일반적입니다.
+
+> 정답은 
+
+> .
+
+> .
+
+> .
+
+> .
+
+> .
+
+```js
+async function wait() {
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  return 10;
+}
+
+function f() {
+  wait().then(result => alert(result));
+}
+
+f();
+```
+
+
+수고하셨습니다.
