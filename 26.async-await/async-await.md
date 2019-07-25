@@ -322,7 +322,7 @@ promise 앞의 `await` 키워드는 자바스크립트가 해당 promise가 끝�
 
 ## 과제
 
-### async/await을 이용하여 재작성하기
+### 1. async/await을 이용하여 재작성하기
 
 아래 예제는 Promise Chaining의 예제입니다. `.then/catch` 대신에 `async/await`을 이용하여 재작성해보세요.
 
@@ -331,14 +331,14 @@ function loadJson(url) {
   return fetch(url)
     .then(response => {
       if (response.status === 200) {
-        return response.json(); // response.json 도 비동기 함수입니다.
+        return response.json();
       } else {
         throw Error(response.status);
       }
   });
 }
 
-loadJson('no-such-user.json') // (3)
+loadJson('no-such-user.json')
   .catch(alert); // Error: 404
 ```
 
@@ -359,8 +359,7 @@ async function loadJson(url) { // (1)
   let response = await fetch(url); // (2)
   
   if(response.status === 200) {
-    let json = await response.json(); // (3)
-    return json;
+    return response.json(); // (3)
   }
   
   throw new Error(response.status);
@@ -370,3 +369,89 @@ loadJson('no-such-user.json')
   .catch(alert); // Error : 404 (4)
 ```
 
+여러분이 알아야 할 것은
+1. `loadJson` 함수가 `async` 함수가 되었습니다.
+2. 모든 `.then`이 `await`으로 교체되었습니다.
+3. `return reponse.json()`을 `await`하지 않고 할 수 있습니다.
+4. `loadJson`으로부터 던져진 에러는 `.catch`에 의해 처리됩니다. 여기서는 `await loadJson(...)`을 사용할 수 없습니다. 우리는 `async` 함수 내부에 있지 않기 때문입니다.
+
+### 2. "rethrow"를 async/await으로 재작성하기
+
+아래에서 "rethrow" 예제를 확인할 수 있습니다. `.then/catch` 대신에 `async/await`을 이용하여 재작성해보세요.
+
+그리고 루프를 선호하는 `modeGithubUser` 내부의 재귀를 없애보세요. 그리고 `async/await`을 써보세요. 훨씬 하기 쉬울 것입니다.
+
+```js
+class HttpError extends Error {
+  constructor(response) {
+    super(`${response.status} for ${response.url}`);
+    this.name = 'HttpError';
+    this.response = response;
+  }
+}
+
+function loadJson(url) {
+  return fetch(url)
+    .then(response => {
+      if(response.status === 200) {
+        return response.json();
+      } else {
+        throw new HttpError(response);
+      }
+    });
+}
+
+// 깃허브가 유효한 사용자를 반환할 때까지 사용자 이름을 요청해보세요.
+function demoGithubUser() {
+  let name = prompt("Enter a name?", "iliakan");
+  
+  return loadJson(`https://api.github.com/user/${name}`)
+    .then(user => {
+      alert(`Full name: ${user.name}.`);
+      return user;
+    })
+    .catch(err => {
+      if (err instanceof HttpError && err.response.status === 404) {
+        alert("No such user, please reenter.");
+        return demoGithubUser();
+      } else {
+        throw err;
+      }
+    });
+}
+
+demoGithubUser();
+```
+
+> 정답은 
+
+> .
+
+> .
+
+> .
+
+> .
+
+> .
+
+```js
+class HttpError extends Error {
+  constructor(response) {
+    super(`${response.status} for ${response.url}`);
+    this.name = 'HttpError';
+    this.response = response;
+  }
+}
+
+function loadJson(url) {
+  return fetch(url)
+    .then(response => {
+      if(response.status === 200) {
+        return response.json();
+      } else {
+        throw new HttpError(response);
+      }
+    });
+}
+```
