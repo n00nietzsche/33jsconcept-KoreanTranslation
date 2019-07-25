@@ -220,3 +220,107 @@ new Waiter()
 ```
 
 결국 의미하는 바는 같습니다. 이 클래스는 반환되는 값이 promise이며 `await`을 사용 가능하게 보장합니다.
+
+### 에러 핸들링
+
+만일 promise가 일반적으로 resolve한다면, `await promise`는 결과를 반환합니다. 하지만 rejection이 된 경우, promise는 에러를 내뱉게 됩니다. 코드 라인에 `throw`가 있는 것 처럼 말입니다.
+
+다음 코드는:
+
+```js
+async function f() {
+  await Promise.reject(new Error("Whoops!"));
+}
+```
+
+는 다음 코드와 같습니다.
+
+```js
+async function f() {
+  throw new Error("Whoops!");
+}
+```
+
+실제 상황에서, promise는 reject 당하기 전 약간의 시간을 소모할 수도 있습니다. 그래서 `await`은 대기할 것입니다. 그리고 그 이후 에러를 `throw`하게 될 것입니다.
+
+우리는 그 에러를 `try...catch`문을 이용하여 잡아낼 수 있습니다. 일반적인 `throw`와 동일합니다.
+
+```js
+async function f() {
+  try {
+    let response = await fetch('http://no-such-url');
+  } catch (err) {
+    alert(err); // TypeError: failed to fatch
+  }
+}
+
+f();
+```
+
+에러의 경우, 제어가 `catch` 블록으로 넘어갑니다. 우리는 `try...catch`를 통해 감싸줄 수 있습니다.
+
+```js
+async function f() {
+  try {
+    let response = await fetch('/no-user-here');
+    let user = await response.json();
+  }catch (err) {
+    // catches errors both in fetch and response.json
+    alert(err);
+  }
+}
+```
+
+만일 우리에게 `try...catch`문이 없었다면, 비동기 함수 `f()`의 호출에 의해 생성된 promise는 그냥 reject될 것입니다. 우리는 그러한 흐름을 제어하기 위해 `.catch`를 붙일 수 있습니다.
+
+```js
+async function f() {
+  let response = await fetch('http://no-such-url');
+}
+
+// f() becomes a rejected promise
+f().catch(alert); // TypeError: failed to fetch // (*)
+```
+
+만일 우리가 `.catch`를 거기에 추가하는 것을 잊었다면, 우리는 제대로 제어되지 않는 promise 에러를 갖게 되는 것입니다. (콘솔에서는 볼 수 있습니다.) 전역 이벤트 핸들러를 사용하여 이러한 에러를 잡아낼 수 있습니다. [Error handling with promise](https://javascript.info/promise-error-handling) 챕터에서 그러한 내용을 볼 수 있습니다.
+
+> `async/await` 그리고 `promise.then/catch`
+
+우리가 `async/await`을 사용할 때, 우리는 간혹 `.then`이 필요합니다 왜냐하면 `await`은 우리를 위한 작업 대기를 처리합니다. 그리고 우리는 `.catch` 대신에 일반적인 `try...catch` 구문을 사용할 수 있습니다. 항상은 아닐지라도 일반적인 구문을 사용하는 것이 편리한 경우가 더 많습니다.
+
+>`async/await`은 `Promise.all`과 잘 작동합니다.
+
+다수의 promise를 기다려야 할 필요가 있을 때, 우리는 그것들을 `Promise.all`로 묶어주고 `await`을 걸 수 있습니다.
+소스코드는 다음과 같이 나올 것입니다.
+
+```js
+// 배열의 결과를 기다립니다.
+let results = await Promise.all([
+  fetch(url1),
+  fetch(url2),
+  ...
+]);
+```
+
+에러가 난 경우에는, 일반적인 케이스와 같이 전파됩니다: 실패한 promise에서 `Promise.all`로 넘기고, 우리가 `try...catch`를 이용하여 캐치할 수 있는 예외가 됩니다.
+
+### 요약
+
+함수 전의 `async` 키워드는 2가지 효과를 갖습니다.
+
+1. 언제나 promise를 반환합니다.
+2. 함수 내부에서 `await`을 사용할 수 있게 해줍니다.
+
+promise 앞의 `await` 키워드는 자바스크립트가 해당 promise가 끝날 때까지 잠시 기다리게 합니다. 그리고
+
+1. 에러가 발생한 경우, 예외가 만들어지고, 그 자리에서 `throw error`가 호출된 것처럼 동작합니다.
+2. 에러가 발생하지 않았다면, 결과를 반환합니다. 그래서 우리가 그 결과 값을 변수에 넣을 수 있습니다.
+
+`async/await`은 읽기 쉽고 쓰기 쉬운 비동기 코드를 작성하는데 좋은 프레임워크입니다.
+
+`async/await`과 함께, 우리는 가끔 `promise.then/catch`를 작성할 필요가 있습니다. 하지만 우리는 여전히 그들이 promise 기반이라는 것을 잊어선 안됩니다. 왜냐하면 때때로 (예를 들면, 가장 바깥 스코프에서) 우리는 그 메소드들을 써야 합니다. 또한 `Promise.all`은 여러 작업들을 일제히 기다리는데 사용하기 매우 좋은 문법입니다.
+
+## 과제
+
+### async/await을 이용하여 재작성하기
+
