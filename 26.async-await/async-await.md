@@ -174,7 +174,7 @@ let user = await response.json();
 })();
 ```
 
-> `await`은 "thenables"를 받습니다.
+> `await`은 "thenable"를 받습니다.
 
 `promise.then`처럼, `await`은 thenable 오브젝트('thenable' 오브젝트란 `.then` 메소드 호출이 가능한 메소드를 말합니다.)를 사용합니다. 제 3 오브젝트는 Promise가 아닐 수도 있다는 겁니다. Promise와 호환 가능하면: 만일 `.then`메소드를 지원만 한다면, `await`과 함께 사용할 수 있는 겁니다.
 
@@ -185,7 +185,38 @@ class Thenable {
   constructor(num) {
     this.num = num;
   }
-  
+  then(resolve, reject) {
+    alert(resolve);
+    // 1초 후에 입력된 숫자의 2배의 값과 함께 resolve됩니다.
+    setTimeout(() => resolve(this.num * 2), 1000); // (*)
+  }
 };
+
+async function f() {
+  // waits for 1 second, then result becomes 2
+  let result = await new Thenable(1);
+  alert(result);
+}
+
+f();
 ```
 
+`await`이 `.then` 메소드를 가진 promise가 아닌 오브젝트를 받았을 때, `await`은 native 함수인 `resolve`, `reject`를 인자로 `.then`메소드를 호출합니다. 그 후에, `await`은 둘 중 하나가 호출될 때까지 기다립니다. (이 예제에서는 `(*)`이 적혀있는 라인에서 그 일이 일어나게 됩니다.) 그리고 그 후에 결과 값과 함께 나머지 코드가 계속됩니다.
+
+> Async 메소드
+
+Async 클래스 메소드를 선언하기 위해서 할 일은, 그냥 `async`라는 키워드를 앞에 붙이면 됩니다.
+
+```js
+class Waiter {
+  async wait() {
+    return await Promise.resolve(1);
+  }
+}
+
+new Waiter()
+  .wait()
+  .then(alert); // 1
+```
+
+결국 의미하는 바는 같습니다. 이 클래스는 반환되는 값이 promise이며 `await`을 사용 가능하게 보장합니다.
