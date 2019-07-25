@@ -324,3 +324,44 @@ promise 앞의 `await` 키워드는 자바스크립트가 해당 promise가 끝�
 
 ### async/await을 이용하여 재작성하기
 
+아래 예제는 Promise Chaining의 예제입니다. `.then/catch` 대신에 `async/await`을 이용하여 재작성해보세요.
+
+```js
+function loadJson(url) {
+  return fetch(url)
+    .then(response => {
+      if (response.status === 200) {
+        return response.json(); // response.json 도 비동기 함수입니다.
+      } else {
+        throw Error(response.status);
+      }
+  });
+}
+
+loadJson('no-such-user.json') // (3)
+  .catch(alert); // Error: 404
+```
+
+> 정답은 
+> .
+> .
+> .
+> .
+> .
+
+```js
+async function loadJson(url) { // (1)
+  let response = await fetch(url); // (2)
+  
+  if(response.status === 200) {
+    let json = await response.json(); // (3)
+    return json;
+  }
+  
+  throw new Error(response.status);
+}
+
+loadJson('no-such-user.json')
+  .catch(alert); // Error : 404 (4)
+```
+
