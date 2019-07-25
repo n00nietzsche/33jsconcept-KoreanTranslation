@@ -515,6 +515,8 @@ P.S. task는 기술적으로 매우 쉽습니다 하지만 async/await을 처음
 
 > .
 
+내부적으로 어떻게 동작을 하는지 아는 것은 도움이 많이 됩니다. `async` 호출을 promise처럼 다뤄주시면 됩니다. `.then`을 붙여주세요.
+
 ```js
 async function wait() {
   await new Promise(resolve => setTimeout(resolve, 1000));
