@@ -101,6 +101,28 @@ function f() {
 
 `showAvatar()` 예제를 봅시다. 이 예제는 [Promise Chaining](https://javascript.info/promise-chaining)이라는 챕터에서 가져왔습니다. 그리고 우린 이 예제를 `async/await`을 이용하여 다시 작성해볼 것입니다.
 
+기존의 소스는 아래와 같은 형태였습니다.
+
+```js
+fetch('/article/promise-chaining/user.json')
+  .then(response => response.json())
+  .then(user => fetch(`https://api.github.com/users/${user.name}`))
+  .then(response => response.json())
+  .then(githubUser => new Promise(function(resolve, reject) {
+    let img = document.createElement('img');
+    img.src = githubUser.avatar_url;
+    img.className = "promise-avatar-example";
+    document.body.append(img);
+
+    setTimeout(() => {
+      img.remove();
+      resolve(githubUser);
+    }, 3000);
+  }))
+  // triggers after 3 seconds
+  .then(githubUser => alert(`Finished showing ${githubUser.name}`));
+```
+
 1. 우리는 `.then`을 `await`으로 대체할 것입니다.
 2. `await`을 쓰기 위해, 함수에 `async`를 붙여줄 것입니다.
 
@@ -131,25 +153,26 @@ async function showAvatar() {
 showAvatar();
 ```
 
-기존의 소스는 아래와 같은 형태였습니다.
+꽤 깔끔하고 읽기 쉬워졌습니다. 맞죠? 이전보다는 훨씬요
+
+> `await`은 최상위 수준(top-level) 코드에서 작동하지 않습니다.
+
+`await`을 이제 막 쓰기 시작한 사람들은 `await`을 최상위 수준(top-level) 코드에서 사용할 수 없다는 사실을 종종 잊는 경향이 있습니다. 예를 들면 다음과 같은 코드는 작동하지 않습니다.
 
 ```js
-fetch('/article/promise-chaining/user.json')
-  .then(response => response.json())
-  .then(user => fetch(`https://api.github.com/users/${user.name}`))
-  .then(response => response.json())
-  .then(githubUser => new Promise(function(resolve, reject) {
-    let img = document.createElement('img');
-    img.src = githubUser.avatar_url;
-    img.className = "promise-avatar-example";
-    document.body.append(img);
-
-    setTimeout(() => {
-      img.remove();
-      resolve(githubUser);
-    }, 3000);
-  }))
-  // triggers after 3 seconds
-  .then(githubUser => alert(`Finished showing ${githubUser.name}`));
+// syntax error in 최상위 수준(top-level) code
+let response = await fetch('/article/promise-chaining/user.json');
+let user = await response.json();
 ```
+
+우린 위의 코드를 익명 async 함수 안에 감쌀 수 있습니다. 다음과 같이요.
+
+```js
+(async () => {
+  let response = await fetch('/article/promise-chaining/user.json');
+  let user = await response.json();
+})();
+```
+
+> `await`은 "thenables"를 받습니다.
 
