@@ -176,3 +176,16 @@ let user = await response.json();
 
 > `await`은 "thenables"를 받습니다.
 
+`promise.then`처럼, `await`은 thenable 오브젝트('thenable' 오브젝트란 `.then` 메소드 호출이 가능한 메소드를 말합니다.)를 사용합니다. 제 3 오브젝트는 Promise가 아닐 수도 있다는 겁니다. Promise와 호환 가능하면: 만일 `.then`메소드를 지원만 한다면, `await`과 함께 사용할 수 있는 겁니다.
+
+여기 데모 `Thenable` 클래스가 있습니다. 아래의 `await`은 `Thenable`의 인스턴스를 받습니다.
+
+```js
+class Thenable {
+  constructor(num) {
+    this.num = num;
+  }
+  
+};
+```
+
