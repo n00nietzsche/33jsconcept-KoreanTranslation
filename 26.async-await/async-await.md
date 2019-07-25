@@ -108,5 +108,48 @@ function f() {
 async function showAvatar() {
   // read our JSON
   let response = await fetch('/article/promise-chaining/user.json');
+  let user = await response.join();
+  
+  // read github user
+  let githubResponse = await fetch(`https://api.github.com/users/${user.name}`);
+  let githubUser = await githubResponse.json();
+  
+  // show the avatar
+  let img = document.createElement('img');
+  img.src = githubUser.avatar_url;
+  img.className = "promise-avatar-example";
+  document.body.append(img);
+  
+  // wait 3 seconds
+  await new Promise((resolve, reject) => setTimeout(resolve, 3000));
+  
+  img.remove();
+  
+  return githubUser;
 }
+
+showAvatar();
 ```
+
+기존의 소스는 아래와 같은 형태였습니다.
+
+```js
+fetch('/article/promise-chaining/user.json')
+  .then(response => response.json())
+  .then(user => fetch(`https://api.github.com/users/${user.name}`))
+  .then(response => response.json())
+  .then(githubUser => new Promise(function(resolve, reject) {
+    let img = document.createElement('img');
+    img.src = githubUser.avatar_url;
+    img.className = "promise-avatar-example";
+    document.body.append(img);
+
+    setTimeout(() => {
+      img.remove();
+      resolve(githubUser);
+    }, 3000);
+  }))
+  // triggers after 3 seconds
+  .then(githubUser => alert(`Finished showing ${githubUser.name}`));
+```
+
