@@ -32,3 +32,60 @@
 
 아래의 예제는 `Stack`을 코드에서 구현한 것입니다. 우리가 stack의 순서를 뒤집을 수 있는 것을 기억하세요. 가장 하위가 가장 상위가 되고, 가장 상위가 가장 하위가 됩니다. 이를테면, 우리는 배열의 `push`와 `pop`의 자리에 `shift`와 `unshift`메소드를 사용할 수 있습니다. 반대로도 가능합니다.
 
+```js
+class Stack {
+	constructor(...items) {
+		this.reverse = false;
+		this.stack = [...items];
+	}
+
+	push(...items) {
+		return this.reverse
+			? this.stack.unshift(...items)
+			: this.stack.push(...items);
+	}
+
+	pop() {
+		return this.reverse ? this.stack.shift() : this.stack.pop();
+	}
+}
+
+mocha.setup("bdd");
+const { assert } = chai;
+
+describe("Stacks", () => {
+	it("Should push items to top of stack", () => {
+		const stack = new Stack(4, 5);
+		assert.equal(stack.push(1, 2, 3), 5);
+		assert.deepEqual(stack.stack, [4, 5, 1, 2, 3]);
+	});
+
+	it("Should push items to bottom of stack", () => {
+		const stack = new Stack(4, 5);
+		stack.reverse = true;
+		assert.equal(stack.push(1, 2, 3), 5);
+		assert.deepEqual(stack.stack, [1, 2, 3, 4, 5]);
+	});
+
+	it("Should pop item from top of stack", () => {
+		const stack = new Stack(1, 2, 3);
+		assert.equal(stack.pop(), 3);
+	});
+
+	it("Should pop item from bottom of stack", () => {
+		const stack = new Stack(1, 2, 3);
+		stack.reverse = true;
+		assert.equal(stack.pop(), 1);
+	});
+});
+
+mocha.run();
+```
+
+[코드펜에서 직접 해보기](https://codepen.io/thonly/pen/GMyLOV)
+
+
+아이템의 숫자가 증가할수록, `unshift`와 `shift`보다 `push`와 `pop`이 놀랍도록 효율적으로 동작합니다. 왜냐하면 모든 아이템은 `shift`와 `unshift`이후에 재인덱싱이 필요하지만, `push`와 `pop`은 재인덱싱이 필요 없습니다.
+
+
+
