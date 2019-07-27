@@ -155,4 +155,186 @@ mocha.run();
 
 배열과 같이, 링크드 리스트는 *스택* 처럼 동작할 수 있습니다. 헤드를 가진 쪽에서 삽입과 삭제를 하게 만들면 되는 것처럼 간단합니다. 링크드 리스트는 *큐* 처럼도 동작할 수 있습니다. 큐처럼 동작하기 위해서는 양방향 링크드 리스트를 만들어야 합니다. 삽입은 테일에서 동작하게 하고 삭제는 헤드에서 동작하게 하면 됩니다. 그리고 반대도 가능합니다. 많은 수의 데이터를 위해, 큐 구현의 이러한 방식은 배열을 사용하는 것보다 더욱 성능이 좋습니다. 왜냐하면 배열의 첫 부분에서의 `shift`와 `unshift` 연산은 모든 연속된 엘리먼트를 다시 재색인하기 위해서 선형시간이 필요하기 때문입니다.
 
-링크드리스트는 클라이언트와 서버 둘 다에서 유용합니다.
+링크드리스트는 클라이언트와 서버 둘 다에서 유용합니다. 클라이언트 사이드에서, **리덕스**와 같은 상태 관리 라이브러리는 미들웨어 로직을 이러한 링크드 리스트 방식으로 구성합니다. *액션* 이 디스패치 됐을 때, *리듀서*에 도달하기 전, 모든 지점이 방문될 때까지, 액션이 하나의 미들웨어에서 다음으로 넘어갑니다. 서버사이드에서, **익스프레스** 와 같은 웹 프레임워크도 역시 미들웨어의 로직을 비슷한 방법으로 구성합니다. 요청이 받아들여졌을 때, 이 요청이 *응답*이 있을 때까지, 하나의 미들웨어에서 다음으로 갑니다.
+
+`양방향 링크드 리스트`의 코드 예제는 다음과 같습니다.
+
+[코드펜에서 직접 해보기](https://codepen.io/thonly/pen/QqRVJX)
+
+```js
+class Node {
+	constructor(value, next, prev) {
+		this.value = value;
+		this.next = next;
+		this.prev = prev;
+	}
+}
+
+class LinkedList {
+	constructor() {
+		this.head = null;
+		this.tail = null;
+	}
+
+	addToHead(value) {
+		const node = new Node(value, null, this.head);
+		if (this.head) this.head.next = node;
+		else this.tail = node;
+		this.head = node;
+	}
+
+	addToTail(value) {
+		const node = new Node(value, this.tail, null);
+		if (this.tail) this.tail.prev = node;
+		else this.head = node;
+		this.tail = node;
+	}
+
+	removeHead() {
+		if (!this.head) return null;
+		const value = this.head.value;
+		this.head = this.head.prev;
+		if (this.head) this.head.next = null;
+		else this.tail = null;
+		return value;
+	}
+
+	removeTail() {
+		if (!this.tail) return null;
+		const value = this.tail.value;
+		this.tail = this.tail.next;
+		if (this.tail) this.tail.prev = null;
+		else this.head = null;
+		return value;
+	}
+
+	search(value) {
+		let current = this.head;
+		while (current) {
+			if (current.value === value) return value;
+			current = current.prev;
+		}
+		return null;
+	}
+
+	indexOf(value) {
+		const indexes = [];
+		let current = this.tail;
+		let index = 0;
+		while (current) {
+			if (current.value === value) indexes.push(index);
+			current = current.next;
+			index++;
+		}
+		return indexes;
+	}
+}
+
+mocha.setup("bdd");
+const { assert } = chai;
+
+describe("Linked List", () => {
+	it("Should add to head", () => {
+		const list = new LinkedList();
+		list.addToHead(1);
+		list.addToHead(2);
+		list.addToHead(3);
+		assert.equal(list.tail.prev, null);
+		assert.equal(list.tail.value, 1);
+		assert.equal(list.tail.next.value, 2);
+		assert.equal(list.head.prev.value, 2);
+		assert.equal(list.head.value, 3);
+		assert.equal(list.head.next, null);
+		assert.equal(list.head.prev.prev.value, 1);
+		assert.equal(list.tail.next.next.value, 3);
+	});
+
+	it("Should add to tail", () => {
+		const list = new LinkedList();
+		list.addToTail(1);
+		list.addToTail(2);
+		list.addToTail(3);
+		assert.equal(list.tail.prev, null);
+		assert.equal(list.tail.value, 3);
+		assert.equal(list.tail.next.value, 2);
+		assert.equal(list.head.prev.value, 2);
+		assert.equal(list.head.value, 1);
+		assert.equal(list.head.next, null);
+		assert.equal(list.head.prev.prev.value, 3);
+		assert.equal(list.tail.next.next.value, 1);
+	});
+
+	it("Should remove head", () => {
+		const list = new LinkedList();
+		list.addToHead(1);
+		list.addToHead(2);
+		list.addToHead(3);
+		assert.equal(list.removeHead(), 3);
+		assert.equal(list.head.value, 2);
+		assert.equal(list.tail.value, 1);
+		assert.equal(list.tail.next.value, 2);
+		assert.equal(list.head.prev.value, 1);
+		assert.equal(list.head.next, null);
+		assert.equal(list.removeHead(), 2);
+		assert.equal(list.head.value, 1);
+		assert.equal(list.tail.value, 1);
+		assert.equal(list.tail.next, null);
+		assert.equal(list.head.prev, null);
+		assert.equal(list.head.next, null);
+		assert.equal(list.removeHead(), 1);
+		assert.equal(list.head, null);
+		assert.equal(list.tail, null);
+	});
+
+	it("Should remove tail", () => {
+		const list = new LinkedList();
+		list.addToTail(1);
+		list.addToTail(2);
+		list.addToTail(3);
+		assert.equal(list.removeTail(), 3);
+		assert.equal(list.head.value, 1);
+		assert.equal(list.tail.value, 2);
+		assert.equal(list.tail.next.value, 1);
+		assert.equal(list.head.prev.value, 2);
+		assert.equal(list.tail.prev, null);
+		assert.equal(list.removeTail(), 2);
+		assert.equal(list.head.value, 1);
+		assert.equal(list.tail.value, 1);
+		assert.equal(list.tail.next, null);
+		assert.equal(list.head.prev, null);
+		assert.equal(list.tail.prev, null);
+		assert.equal(list.removeTail(), 1);
+		assert.equal(list.head, null);
+		assert.equal(list.tail, null);
+	});
+
+	it("Should search for value", () => {
+		const list = new LinkedList();
+		list.addToHead(1);
+		list.addToHead(2);
+		list.addToHead(3);
+		assert.equal(list.search(1), 1);
+		assert.equal(list.search(2), 2);
+		assert.equal(list.search(3), 3);
+		assert.equal(list.search(4), null);
+	});
+
+	it("Should search for indexes of value", () => {
+		const list = new LinkedList();
+		list.addToTail(1);
+		list.addToTail(2);
+		list.addToTail(3);
+		list.addToTail(3);
+		list.addToTail(1);
+		assert.deepEqual(list.indexOf(1), [0, 4]);
+		assert.deepEqual(list.indexOf(2), [3]);
+		assert.deepEqual(list.indexOf(3), [1, 2]);
+		assert.deepEqual(list.indexOf(4), []);
+	});
+});
+
+mocha.run();
+```
+
+## 트리
+
