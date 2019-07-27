@@ -91,4 +91,59 @@ mocha.run();
 
 자바스크립트는 **이벤트 중심**의 프로그래밍 언어입니다. 이러한 특징은 *논 블락킹* 연산을 지원하는 것을 가능하게 합니다. 내부적으로 브라우저는 전체 자바스크립트 코드를 관리하기 위해서 *오직 하나의 스레드* 만 관리합니다. **이벤트 큐**를 사용하며 `리스너`와 등록된 `이벤트`를 큐에 넣습니다. 싱글-스레드 환경에서 비동기성을 지원하기 위해서, (CPU 자원을 아끼고, 웹 UX를 증진시키기 위해서), `리스너 함수`는 *큐에서 빠지고(dequeue)* **콜스택**이 비었을 때만, 실행됩니다. `Promise`는 다른 연산을 방해하지 않는 비동기적인 코드를 "동기화된-스타일"로 실행하는 것을 가능하게 하기 위해 이러한 *이벤트 중심* **아키텍쳐**에 의존합니다. 
 
-프로그래밍적으로, `Queue`는 그냥 두가지 주요한 연산기능이 있는 배열입니다. `unshift`와 `pop` 연산이 있습니다. **Unshift** 연산은 배열의 끝까지 아이템을 넣습니다. **Pop** 은 배열의 시작점부터 아이템을 가져옵니다. 다른 말로 하자면, **큐**는 "먼저 들어간 것이 먼저 나온다. (First In, First Out, FIFO)" 프로토콜을 따릅니다. 
+프로그래밍적으로, `Queue`는 그냥 두가지 주요한 연산기능이 있는 배열입니다. `unshift`와 `pop` 연산이 있습니다. **Unshift** 연산은 배열의 끝까지 아이템을 넣습니다. **Pop** 은 배열의 시작점부터 아이템을 가져옵니다. 다른 말로 하자면, **큐**는 "먼저 들어간 것이 먼저 나온다. (First In, First Out, FIFO)" 프로토콜을 따릅니다. 만일 방향이 거꾸로 되었다면, 우리는 `unshift`와 `pop`을 `push`와 `shift`로 바꾸어서 사용할 수 있습니다. 반대도 당연히 가능합니다.
+
+큐를 코드로 구현하자면 다음과 같습니다.
+
+[코드펜에서 직접 해보기](https://codepen.io/thonly/pen/KypxZg)
+
+```js
+class Queue {
+	constructor(...items) {
+		this.reverse = false;
+		this.queue = [...items];
+	}
+
+	enqueue(...items) {
+		return this.reverse
+			? this.queue.push(...items)
+			: this.queue.unshift(...items);
+	}
+
+	dequeue() {
+		return this.reverse ? this.queue.shift() : this.queue.pop();
+	}
+}
+
+mocha.setup("bdd");
+const { assert } = chai;
+
+describe("Queues", () => {
+	it("Should enqueue items to the left", () => {
+		const queue = new Queue(4, 5);
+		assert.equal(queue.enqueue(1, 2, 3), 5);
+		assert.deepEqual(queue.queue, [1, 2, 3, 4, 5]);
+	});
+
+	it("Should enqueue items to the right", () => {
+		const queue = new Queue(4, 5);
+		queue.reverse = true;
+		assert.equal(queue.enqueue(1, 2, 3), 5);
+		assert.deepEqual(queue.queue, [4, 5, 1, 2, 3]);
+	});
+
+	it("Should dequeue item from the right", () => {
+		const queue = new Queue(1, 2, 3);
+		assert.equal(queue.dequeue(), 3);
+	});
+
+	it("Should dequeue item from the left", () => {
+		const queue = new Queue(1, 2, 3);
+		queue.reverse = true;
+		assert.equal(queue.dequeue(), 1);
+	});
+});
+
+mocha.run();
+```
+
